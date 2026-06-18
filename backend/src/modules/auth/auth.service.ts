@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '8h';
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_MINUTES = 15;
+const MIN_PASSWORD_LENGTH = 8;
 
 if (!JWT_SECRET) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno');
@@ -26,6 +27,10 @@ export interface LoginDTO {
 
 const authService = {
     async register(data: RegisterDTO) {
+        if (typeof data.password !== 'string' || data.password.length < MIN_PASSWORD_LENGTH) {
+            throw { status: 400, message: `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres` };
+        }
+
         const existing = await authRepository.findByEmail(data.email);
 
         if (existing) {
