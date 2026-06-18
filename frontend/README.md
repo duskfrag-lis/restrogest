@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# RestroGest Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend web de RestroGest construido con React, TypeScript y Vite. La primera funcionalidad implementada es la experiencia de autenticacion conectada al backend existente.
 
-Currently, two official plugins are available:
+## Que es
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Es la interfaz de entrada para los usuarios de RestroGest. Permite iniciar sesion, registrar usuarios cliente, restaurar una sesion activa por cookie y cerrar sesion.
 
-## React Compiler
+## Para que sirve
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Sirve como puerta de acceso al sistema antes de construir los modulos operativos del restaurante. El usuario no manipula tokens manualmente: el backend crea una cookie `HttpOnly` y el frontend solo envia credenciales incluidas en cada peticion.
 
-## Expanding the ESLint configuration
+## Como funciona
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+La arquitectura del auth esta organizada por capas:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- `features/auth/domain`: tipos del dominio y contrato del repositorio.
+- `features/auth/application`: servicio de sesion usado por la UI.
+- `features/auth/infrastructure`: implementacion HTTP conectada al backend.
+- `features/auth/presentation`: provider, hook y componentes visuales.
+- `shared/infrastructure/http`: cliente HTTP comun con manejo de errores.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+El flujo principal es:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. La app inicia y llama `GET /api/auth/me` para validar si existe una cookie activa.
+2. Login llama `POST /api/auth/login` con `email` y `password`.
+3. Registro llama `POST /api/auth/register` con nombre, apellido, telefono opcional, correo y contrasena.
+4. Logout llama `POST /api/auth/logout` y limpia la sesion local.
+
+Todas las peticiones usan `credentials: 'include'` para que el navegador envie y reciba la cookie del backend.
+
+## Variables de entorno
+
+Crear `frontend/.env` desde este ejemplo:
+
+```env
+VITE_API_URL=http://localhost:3000/api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Si el backend esta en otro puerto durante desarrollo, cambia el valor. Ejemplo:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:3003/api
 ```
+
+## Comandos
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+```
+
+## UI implementada
+
+- Tema claro y oscuro con preferencia guardada en `localStorage`.
+- Color principal rojo para identidad visual.
+- Login y registro en una sola experiencia.
+- Boton para mostrar u ocultar contrasena.
+- Mensajes de error provenientes del backend.
+- Pantalla de sesion autenticada con rol y cierre de sesion.
