@@ -7,7 +7,7 @@ import authRoutes from './modules/auth/auth.routes';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
