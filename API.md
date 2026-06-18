@@ -3,6 +3,13 @@
 Base URL local: `http://localhost:3000/api`
 
 Todas las rutas protegidas requieren la cookie `token` (HttpOnly), seteada automáticamente al hacer login.
+Desde el frontend se debe enviar cada petición autenticada con credenciales incluidas:
+
+```typescript
+fetch('http://localhost:3000/api/auth/me', {
+  credentials: 'include'
+});
+```
 
 ---
 
@@ -37,12 +44,13 @@ Registra un nuevo usuario con rol `cliente` por defecto.
 
 **Errores:**
 - `400` — Faltan campos obligatorios
+- `400` — La contraseña tiene menos de 8 caracteres
 - `409` — El correo ya está registrado
 
 ---
 
 ### POST `/api/auth/login`
-Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h).
+Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h). La cookie usa `SameSite=Lax`, `path=/` y `Secure` solo cuando `NODE_ENV=production`.
 
 **Body:**
 ```json
@@ -75,7 +83,7 @@ Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h).
 ---
 
 ### POST `/api/auth/logout`
-Cierra la sesión actual, limpiando la cookie `token`.
+Cierra la sesión actual, limpiando la cookie `token` con las mismas opciones base usadas al crearla.
 
 **Body:** ninguno
 

@@ -7,7 +7,7 @@ CREATE TABLE restaurant_info (
     email VARCHAR(255),
     schedule JSONB,
     social_links JSONB,
-    converage_zones JSONB,
+    coverage_zones JSONB,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

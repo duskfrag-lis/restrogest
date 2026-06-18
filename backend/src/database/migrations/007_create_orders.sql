@@ -2,7 +2,7 @@ CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     table_id UUID REFERENCES restaurant_tables(id) ON DELETE SET NULL,
     waiter_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    type VARCHAR(20) NOT NULL DEFAULT 'mesa' CHECK (type IN ('mmesa', 'domicilio')),
+    type VARCHAR(20) NOT NULL DEFAULT 'mesa' CHECK (type IN ('mesa', 'domicilio')),
     status VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'en_preparacion', 'listo', 'entregado', 'cancelado')),
     total DECIMAL(10,2) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
