@@ -1,5 +1,20 @@
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import authService from './auth.service';
+
+const AUTH_COOKIE_NAME = 'token';
+const SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
+
+const sharedCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+};
+
+const sessionCookieOptions: CookieOptions = {
+    ...sharedCookieOptions,
+    maxAge: SESSION_DURATION_MS,
+};
 
 const authController = {
     
@@ -48,12 +63,7 @@ const authController = {
 
             const { token, user } = await authService.login({ email, password });
 
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 8 * 60 * 1000, 
-            });
+            res.cookie(AUTH_COOKIE_NAME, token, sessionCookieOptions);
 
             return res.status(200).json({
                 message: 'Inicio de sesión exitoso',
@@ -71,7 +81,7 @@ const authController = {
 
     async logout(_req: Request, res: Response) {
 
-        res.clearCookie('token');
+        res.clearCookie(AUTH_COOKIE_NAME, sharedCookieOptions);
 
         return res.status(200).json({ message: 'Sesión cerrada correctamente' });
     },
