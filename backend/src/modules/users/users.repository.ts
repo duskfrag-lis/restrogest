@@ -14,7 +14,7 @@ const usersRepository = {
                 WHERE r.name = $1
                 ORDER BY u.created_at DESC`
 
-            : `SELECT u.id, u.first_name, u.last_name, u.email, u.phone, u.is_active
+            : `SELECT u.id, u.first_name, u.last_name, u.email, u.phone, u.is_active,
                     u.email_verified, u.provider, u.created_at, r.name as role
                 FROM users u
                 JOIN user_roles ur ON ur.user_id = u.id
@@ -29,7 +29,7 @@ const usersRepository = {
     async findById(id: string) {
         const { rows } = await pool.query(
 
-            `SELECT u.id, u.first_name, u.last_name, u.email, u.phone, u.is_active, u.email:verified,
+            `SELECT u.id, u.first_name, u.last_name, u.email, u.phone, u.is_active, u.email_verified,
                 u.provider, u.created_at, r.name as role
             FROM users u
             JOIN user_roles ur ON ur.user_id = u.id
@@ -79,7 +79,7 @@ const usersRepository = {
         if (!rows[0]) throw { status: 400, message: `El rol '${newRole}' no existe`};
 
         await pool.query(
-            `UPDATE user_roles SET role_id = $1 WHERE user_id = $2`, [rows[0], userId]
+            `UPDATE user_roles SET role_id = $1 WHERE user_id = $2`, [rows[0].id, userId]
         );
     },
 
@@ -119,7 +119,7 @@ const usersRepository = {
     async markTokenUsed(tokenId: string) {
 
         await pool.query(
-            `UPDATE token SET used_at = NOW() WHRE id =$1`,
+            `UPDATE tokens SET used_at = NOW() WHERE id =$1`,
             [tokenId]
         );
     },
