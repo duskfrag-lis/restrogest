@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './modules/auth/auth.routes';
+import usersRouter from './modules/users/users.routes';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRouter);
 
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', project: 'RestroGest' });
