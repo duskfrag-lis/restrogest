@@ -127,3 +127,154 @@ Verifica que el rol del usuario autenticado esté en la lista permitida. Si no, 
 ```typescript
 router.get('/admin/reports', authenticate, authorize('administrador'), reportsController.getReports);
 ```
+
+---
+
+## Users — `/api/users`
+
+### POST `/api/users/activate`
+Ruta pública. Activa la cuenta de un empleado usando el token enviado por correo y establece su contraseña.
+
+**Body:**
+```json
+{
+  "token": "string (requerido)",
+  "password": "string (requerido, mín. 8 caracteres)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Cuenta activada correctamente. Ya puedes iniciar sesión." }
+```
+
+**Errores:**
+- `400` — Token y/o contraseña faltantes, o token inválido/expirado
+
+---
+
+### GET `/api/users`
+Requiere autenticación + rol `administrador`. Lista todos los usuarios del sistema.
+
+**Query params:**
+- `role` (opcional) — filtra por rol (`cliente`, `mesero`, `cocinero`, `jefe_cocina`, `domiciliario`, `administrador`)
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "users": [
+    {
+      "id": "uuid",
+      "first_name": "string",
+      "last_name": "string",
+      "email": "string",
+      "phone": "string | null",
+      "is_active": "boolean",
+      "email_verified": "boolean",
+      "provider": "local | google",
+      "created_at": "timestamp",
+      "role": "string"
+    }
+  ]
+}
+```
+
+**Errores:**
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+
+---
+
+### GET `/api/users/:id`
+Requiere autenticación + rol `administrador`. Obtiene un usuario por su ID.
+
+**Respuesta exitosa `200`:**
+```json
+{ "user": { /* mismo shape que arriba */ } }
+```
+
+**Errores:**
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Usuario no encontrado
+
+---
+
+### POST `/api/users/employees`
+Requiere autenticación + rol `administrador`. Crea una cuenta de empleado sin contraseña y envía correo de activación (válido 24h).
+
+**Body:**
+```json
+{
+  "first_name": "string (requerido)",
+  "last_name": "string (requerido)",
+  "email": "string (requerido)",
+  "phone": "string (opcional)",
+  "role": "mesero | cocinero | jefe_cocina | domiciliario | administrador (requerido)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{
+  "message": "Empleado creado correctamente. Se envió un correo de activación.",
+  "user": {
+    "id": "uuid",
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string"
+  }
+}
+```
+
+**Errores:**
+- `400` — Campos faltantes o rol inválido
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `409` — El correo ya está registrado
+
+---
+
+### PATCH `/api/users/:id/role`
+Requiere autenticación + rol `administrador`. Cambia el rol de un usuario existente.
+
+**Body:**
+```json
+{ "role": "string (requerido)" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Rol actualizado a '<rol>' correctamente" }
+```
+
+**Errores:**
+- `400` — Rol inválido
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Usuario no encontrado
+
+---
+
+### PATCH `/api/users/:id/status`
+Requiere autenticación + rol `administrador`. Activa o desactiva la cuenta de un usuario. Si se desactiva, cualquier sesión activa de ese usuario queda invalidada de inmediato (verificación en tiempo real en cada request).
+
+**Body:**
+```json
+{ "is_active": "boolean (requerido)" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Cuenta activada correctamente" }
+```
+o
+```json
+{ "message": "Cuenta desactivada correctamente" }
+```
+
+**Errores:**
+- `400` — `is_active` no es booleano
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Usuario no encontrado
