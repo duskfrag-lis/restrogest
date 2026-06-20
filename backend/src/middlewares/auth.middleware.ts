@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import pool from '../config/db';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -9,7 +10,7 @@ if (!JWT_SECRET) {
 
 const SECRET: string = JWT_SECRET;
 
-export function authenticate(req: Request, res: Response, next: NextFunction) {
+export async function authenticate(req: Request, res: Response, next: NextFunction) {
 
     const token = req.cookies?.token;
 
@@ -19,7 +20,18 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
     try {
 
-        const decoded = jwt.verify(token, SECRET);
+        const decoded = jwt.verify(token, SECRET) as { id: string; email: string; role: string };
+        
+        const { rows } = await pool.query(
+            'SELECT is_active FROM users WHERE id = $1', [decoded.id]
+        );
+
+        const user = rows[0];
+
+        if (!user || !user.is_active) {
+            return res.status(401).json({ message: 'Tu sesión ya no es válida. Inicia sesión nuevamente.' });
+        }
+
         (req as any).user = decoded;
         next();
 
