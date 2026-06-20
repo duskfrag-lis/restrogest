@@ -1,5 +1,5 @@
 import pool from '../../config/db';
-import crypto from 'crypto';
+
 
 const usersRepository = {
     async findAll(role?: string) {
@@ -9,7 +9,7 @@ const usersRepository = {
                     u.is_active, u.email_verified, u.provider, u.created_at,
                     r.name as role
                 FROM users u
-                JOIN user_role ur ON ur.user_id = u.id
+                JOIN user_roles ur ON ur.user_id = u.id
                 JOIN roles r ON r.id = ur.role_id
                 WHERE r.name = $1
                 ORDER BY u.created_at DESC`
@@ -91,38 +91,6 @@ const usersRepository = {
         );
     },
 
-    async createActivationToken(userId: string) {
-
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
-
-        await pool.query(
-            `INSERT INTO tokens (user_id, token, type, expires_at) VALUES ($1, $2, 'employee_activation', $3)`,
-            [userId, token, expiresAt]
-        );
-        
-        return token;
-    },
-
-    async findValidToken(token: string, type: string) {
-
-        const { rows } = await pool.query(
-
-            `SELECT * FROM tokens
-            WHERE token = $1 AND type = $2 AND used_at IS NULL AND expires_at > NOW()`,
-            [token, type]
-        );
-
-        return rows[0] || null;
-    },
-
-    async markTokenUsed(tokenId: string) {
-
-        await pool.query(
-            `UPDATE tokens SET used_at = NOW() WHERE id =$1`,
-            [tokenId]
-        );
-    },
 };
 
 export default usersRepository;

@@ -1,7 +1,11 @@
 import usersRepository from './users.repository';
 import emailService from '../../config/email';
+import tokensRepository from '../../config/tokens.repository';
+import pool from '../../config/db';
+import bcrypt from 'bcryptjs';
 
 const EMPLOYEE_ROLES = ['mesero', 'cocinero', 'jefe_cocina', 'domiciliario', 'administrador'];
+const ACTIVATION_TOKEN_EXPIRY = 24 * 60 * 60 * 1000;
 
 const usersService = {
 
@@ -30,7 +34,7 @@ const usersService = {
         }
 
         const user = await usersRepository.createEmployee(data);
-        const token = await usersRepository.createActivationToken(user.id);
+        const token = await tokensRepository.create(user.id, 'employee_activation', ACTIVATION_TOKEN_EXPIRY);
 
         await emailService.sendEmployeeActivation(
             user.email,
@@ -44,21 +48,19 @@ const usersService = {
     },
 
     async activateEmployee(token: string, password: string) {
-        const tokenRecord = await usersRepository.findValidToken(token, 'employee_activation');
+        const tokenRecord = await tokensRepository.findValid(token, 'employee_activation');
 
         if (!tokenRecord) {
             throw { status: 400, message: 'El enlace de activación es inválido o ha expirado.'};
         }
 
-        const bcrypt = await import('bcryptjs');
         const password_hash = await bcrypt.hash(password, 10);
 
-        await import('../../config/db').then(({ default: pool }) => pool.query(
-                `UPDATE users SET password_hash = $1, email_verified = true WHERE id = $2`, [password_hash, tokenRecord.user_id]
-            )
+        await pool.query(
+            `UPDATE users SET password_hash = $1, email_verified = true WHERE id = $2`, [password_hash, tokenRecord.user_id]
         );
 
-        await usersRepository.markTokenUsed(tokenRecord.id);
+        await tokensRepository.markUsed(tokenRecord.id);
 
         return { message: 'Cuenta activada correctamente. Ya puedes iniciar sesión.'};
     },
