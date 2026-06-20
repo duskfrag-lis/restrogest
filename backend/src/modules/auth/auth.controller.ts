@@ -49,6 +49,29 @@ const authController = {
         }
     },
 
+    async verifyEmail(req: Request, res: Response) {
+
+        try {
+
+            const { token } = req.body;
+
+            if (!token) {
+                return res.status(400).json({ message: 'El token es obligatorio' });
+            }
+
+            const result = await authService.verifyEmail(token);
+
+            return res.status(200).json(result);
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            const message = err.message || 'Error interno del servidor';
+
+            return res.status(status).json({ message });
+        }
+    },
+
     async login(req: Request, res: Response) {
 
         try {

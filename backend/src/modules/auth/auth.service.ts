@@ -1,12 +1,15 @@
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
 import authRepository from "./auth.repository";
+import tokensRepository from "../../config/tokens.repository";
+import emailService from "../../config/email";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '8h';
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_MINUTES = 15;
 const MIN_PASSWORD_LENGTH = 8;
+const VERIFICATION_TOKEN_EXPIRY = 24 * 60 * 60 * 1000;
 
 if (!JWT_SECRET) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno');
@@ -26,7 +29,9 @@ export interface LoginDTO {
 }
 
 const authService = {
+
     async register(data: RegisterDTO) {
+
         if (typeof data.password !== 'string' || data.password.length < MIN_PASSWORD_LENGTH) {
             throw { status: 400, message: `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres` };
         }
@@ -50,8 +55,13 @@ const authService = {
 
         await authRepository.assignDefaultRole(user.id);
 
-        //TODO: enviar correo de verificación
-        //emailService.sendVerification(user.email, user.id)
+        const verificationToken = await tokensRepository.create(
+            user.id, 'email_verification', VERIFICATION_TOKEN_EXPIRY
+        );
+
+        await emailService.sendEmailVerification(
+            user.email, user.first_name, verificationToken
+        );
 
         return {
             message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
@@ -62,6 +72,21 @@ const authService = {
                 email: user.email,
             },
         };
+    },
+
+    async verifyEmail(token: string) {
+
+        const tokenRecord = await tokensRepository.findValid(token, 'email_verification');
+
+        if (!tokenRecord) {
+            throw { status: 400, message: 'El enlace de verificación es inválido o ha expirado.' };
+        }
+
+        await authRepository.verifyEmail(tokenRecord.user_id);
+
+        await tokensRepository.markUsed(tokenRecord.id);
+
+        return { message: 'Correo verificado correctamente. Ya puedes iniciar sesión.' };
     },
 
     async login(data: LoginDTO) {
@@ -77,6 +102,10 @@ const authService = {
 
         if (user.provider === 'google') {
             throw { status: 400, message: 'Esta cuenta usa Google para iniciar sesión.'};
+        }
+
+        if (!user.email_verified) {
+            throw { status: 400, message: 'Debes verificar tu correo antes de iniciar sesión.' };
         }
 
         if (user.login_attempts >= MAX_LOGIN_ATTEMPTS) {
