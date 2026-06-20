@@ -69,7 +69,7 @@ const authRepository = {
 
     async verifyEmail(userId: string) {
         await pool.query(
-            `UPDATE users SET email_verified = true WHRE id = $1`, [userId]
+            `UPDATE users SET email_verified = true WHERE id = $1`, [userId]
         );
     },
 
@@ -91,6 +91,7 @@ const authRepository = {
             `UPDATE users SET login_attempts = 0 WHERE email = $1`, [email]
         );
     },
+
 };
 
 export default authRepository;
