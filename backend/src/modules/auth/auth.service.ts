@@ -10,6 +10,7 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_MINUTES = 15;
 const MIN_PASSWORD_LENGTH = 8;
 const VERIFICATION_TOKEN_EXPIRY = 24 * 60 * 60 * 1000;
+const RESET_TOKEN_EXPIRY = 30 * 60 * 1000;
 
 if (!JWT_SECRET) {
     throw new Error('JWT_SECRET no está definido en las variables de entorno');
@@ -87,6 +88,46 @@ const authService = {
         await tokensRepository.markUsed(tokenRecord.id);
 
         return { message: 'Correo verificado correctamente. Ya puedes iniciar sesión.' };
+    },
+
+    async forgotPassword(email: string) {
+
+        const user = await authRepository.findByEmail(email);
+
+        if (!user) {
+            return { message: 'Si el correo existe en nuestro sistema, recibirás un enlace de recuperación.' };
+        }
+
+        if (user.provider == 'google') {
+            return { message: 'Si el correo existe en nuestro sistema, recibirás un enlace de recuperación.'}
+        }
+
+        const resetToken = await tokensRepository.create(
+            user.id, 'password_reset', RESET_TOKEN_EXPIRY
+        );
+        
+        await emailService.sendPasswordReset(user.email, user.first_name, resetToken);
+
+        return { message: 'Si el correo existe en nuestro sistema, recibirás un enlace de recuperación.' };
+    },
+
+    async resetPassword(token: string, newPassword: string) {
+
+        if (typeof newPassword !== 'string' || newPassword.length < MIN_PASSWORD_LENGTH) {
+            throw { status: 400, message: `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres` };
+        }
+
+        const tokenRecord = await tokensRepository.findValid(token, 'password_reset');
+
+        if (!tokenRecord) {
+            throw { status: 400, message: 'El enlace de recuperación es inválido o ha expirado.' };
+        }
+
+        const password_hash = await bcrypt.hash(newPassword, 10);
+        await authRepository.updatePassword(tokenRecord.user_id, password_hash);
+        await tokensRepository.markUsed(tokenRecord.id);
+
+        return { message: 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.' };
     },
 
     async login(data: LoginDTO) {

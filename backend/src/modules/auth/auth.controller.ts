@@ -72,6 +72,52 @@ const authController = {
         }
     },
 
+    async forgotPassword(req: Request, res: Response) {
+
+        try {
+
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ message: 'El correo es obligatorio' });
+            }
+
+            const result = await authService.forgotPassword(email);
+
+            return res.status(200).json(result);
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            const message = err.message || 'Error interno  del servidor';
+
+            return res.status(status).json({ message });
+        }
+    },
+
+    async resetPassword(req: Request, res: Response) {
+
+        try {
+
+            const { token, password } = req.body;
+
+            if (!token || !password) {
+                return res.status(400).json({ message: 'Token y nueva contraseña son obligatorios.' });
+            }
+
+            const result = await authService.resetPassword(token, password);
+
+            return res.status(200).json(result);
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            const message = err.message || 'Error interno del servidor';
+
+            return res.status(status).json({ message });
+        }
+    },
+
     async login(req: Request, res: Response) {
 
         try {
