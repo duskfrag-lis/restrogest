@@ -105,6 +105,41 @@ Ruta pública. Restablece la contraseña usando el token recibido por correo.
 **Errores:**
 - `400` — Contraseña muy corta, o token inválido/expirado
 
+---
+
+### GET `/api/auth/google`
+Ruta pública. Redirige al flujo de autenticación de Google OAuth2.
+
+**Respuesta:** Redirect a la pantalla de selección de cuenta de Google.
+
+---
+
+### GET `/api/auth/google/callback`
+Ruta pública. Callback que Google llama tras la autorización del usuario. Crea el usuario si no existe (con `provider: 'google'`, correo ya verificado y rol `cliente`), emite el JWT y setea la cookie de sesión.
+
+**Respuesta exitosa:** Redirect a `{FRONTEND_URL}/auth/success`
+
+**Errores:**
+- Si el correo ya está registrado con un proveedor distinto a Google (`local`), redirige a `{FRONTEND_URL}/login?error=google_auth_failed`
+
+---
+
+## Rate limiting
+
+Las siguientes rutas tienen límite de requests por IP para prevenir ataques de fuerza bruta:
+
+| Ruta | Límite | Ventana |
+|---|---|---|
+| `POST /api/auth/register` | 10 requests | 15 minutos |
+| `POST /api/auth/login` | 10 requests | 15 minutos |
+| `POST /api/auth/forgot-password` | 5 requests | 15 minutos |
+| `POST /api/auth/reset-password` | 5 requests | 15 minutos |
+
+Al exceder el límite, el sistema responde `429 Too Many Requests` con:
+```json
+{ "message": "Demasiados intentos. Intenta de nuevo en unos minutos." }
+```
+
 ### POST `/api/auth/login`
 Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h). La cookie usa `SameSite=Lax`, `path=/` y `Secure` solo cuando `NODE_ENV=production`.
 
