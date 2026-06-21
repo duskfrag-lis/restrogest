@@ -148,6 +148,23 @@ const authController = {
         }
     },
 
+    async googleCallback(req: Request, res: Response) {
+
+        try {
+
+            const user = req.user as any;
+            const result = await authService.loginWithGoogle(user);
+
+            res.cookie(AUTH_COOKIE_NAME, result.token, sessionCookieOptions);
+
+            return res.redirect(`${process.env.FRONTEND_URL}/auth/success`);
+
+        } catch (err: any) {
+
+            return res.redirect(`${process.env.FRONTEND_URL}/login?error=google_auth_failed`);
+        }
+    },
+
     async logout(_req: Request, res: Response) {
 
         res.clearCookie(AUTH_COOKIE_NAME, sharedCookieOptions);

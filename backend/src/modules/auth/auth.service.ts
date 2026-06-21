@@ -192,6 +192,23 @@ const authService = {
         return { token, user: userWithRole };
     },
 
+    async loginWithGoogle(user: any) {
+
+        const userWithRole = await authRepository.getUserWithRole(user.id);
+
+        const token = jwt.sign(
+            {
+                id: user.is,
+                email: user.email,
+                role: userWithRole.role,
+            },
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
+        )
+
+        return { token, user: userWithRole };
+    },
+
     async verifyToken(token: string) {
         
         try {

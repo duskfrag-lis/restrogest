@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './modules/auth/auth.routes';
 import usersRouter from './modules/users/users.routes';
+import passport from './config/passport';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRouter);
 
