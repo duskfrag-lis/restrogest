@@ -49,6 +49,62 @@ Registra un nuevo usuario con rol `cliente` por defecto.
 
 ---
 
+### POST `/api/auth/verify-email`
+Ruta pública. Verifica el correo de un usuario recién registrado usando el token enviado por correo (válido 24h).
+
+**Body:**
+```json
+{
+  "token": "string (requerido)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Correo verificado correctamente. Ya puedes iniciar sesión." }
+```
+
+**Errores:**
+- `400` — Token faltante, inválido o expirado
+
+---
+
+### POST `/api/auth/forgot-password`
+Ruta pública. Solicita un enlace de recuperación de contraseña (válido 30 minutos). Por seguridad, siempre responde con el mismo mensaje genérico, exista o no el correo en el sistema, y aunque la cuenta use Google como proveedor.
+
+**Body:**
+```json
+{
+  "email": "string (requerido)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." }
+```
+
+---
+
+### POST `/api/auth/reset-password`
+Ruta pública. Restablece la contraseña usando el token recibido por correo.
+
+**Body:**
+```json
+{
+  "token": "string (requerido)",
+  "password": "string (requerido, mín. 8 caracteres)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Contraseña actualizada correctamente. Ya puedes iniciar sesión." }
+```
+
+**Errores:**
+- `400` — Contraseña muy corta, o token inválido/expirado
+
 ### POST `/api/auth/login`
 Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h). La cookie usa `SameSite=Lax`, `path=/` y `Secure` solo cuando `NODE_ENV=production`.
 
@@ -75,7 +131,7 @@ Autentica un usuario y setea la cookie `token` (JWT, HttpOnly, expira en 8h). La
 ```
 
 **Errores:**
-- `400` — Faltan campos, o la cuenta usa Google como proveedor
+- `400` — Faltan campos, o la cuenta usa Google como proveedor, o el correo no ha sido verificado
 - `401` — Credenciales inválidas
 - `403` — Cuenta desactivada
 - `429` — Cuenta bloqueada temporalmente por intentos fallidos (5 intentos, bloqueo de 15 min)
