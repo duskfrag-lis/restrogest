@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes';
 import usersRouter from './modules/users/users.routes';
 import passport from './config/passport';
+import menuRoutes from './modules/menu/menu.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRouter);
+app.use('/api/menu', menuRoutes);
 
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', project: 'RestroGest' });
