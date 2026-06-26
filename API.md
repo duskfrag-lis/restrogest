@@ -369,3 +369,253 @@ o
 - `401` — No autenticado
 - `403` — Rol distinto a administrador
 - `404` — Usuario no encontrado
+
+---
+
+## Menú — `/api/menu`
+### GET `/api/menu/categories`
+Ruta pública. Lista todas las categorías del menú.
+
+**Query params:**
+- `onlyActive` (opcional) - `true` para mostrar solo categorías activas
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "categories": [
+    {
+      "id": "uuid",
+      "name": "string",
+      "description": "string | null",
+      "sort_order": "number",
+      "is_active": "boolean",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+---
+
+## GET `api/menu/categories/:id`
+Ruta pública. Obtiene una categoria por su ID.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "category": { /*mismo shape que arriba */ }
+}
+```
+**Errores:**
+
+- `404` - Categoría no encontrada
+
+---
+
+## POST `api/menu/categories`
+Requiere autenticación + rol `administrador`. Crea una categoría.
+
+**Body:**
+```json
+{
+  "name": "string (requerido)",
+  "description": "string (opcional)",
+  "sort_order": "number (opcional)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{
+  "result": { /* categoría creada */ }
+}
+```
+
+**Errores:**
+- `400` - Nombre faltante
+- `401` - No autenticado
+- `403` - Rol distinto a administrador
+
+---
+
+## PUT `api/menu/categories/:id`
+Requiere autenticación + rol `administrador`. Actualiza una categoría existente.
+
+**Body (todos opcionales):**
+```json
+{
+  "name": "string",
+  "description": "string",
+  "sort_order": "number",
+  "is_active": "boolean"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "result": { /* categoría actualizada */ }
+}
+```
+
+**Errores:**
+- `401` - No autenticado
+- `403` - Rol distinto a administrador
+- `404` - Categoría no encontrada
+
+---
+
+## PATCH `api/menu/categories/:id/toggle`
+Requiere autenticación + rol `administrador`. Activa o desactiva una categoría.
+
+**Body:** ninguno
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "message": "Categoría Activada correctamente",
+  "category": { /* categoria actualizada */ }
+}
+```
+
+**Errores:**
+- `401` - no autenticado
+- `403` - Rol distinto a administrador
+- `404` - Categoria no encontrada
+
+---
+
+## GET `api/menu/items`
+Ruta pública. Lista todos los ítems del menú.
+
+**Query params:**
+- `onlyActive` (opcional) - `true` para mostrar solo ítems activos
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "category_id": "uuid",
+      "name": "string",
+      "description": "string | null",
+      "price": "number",
+      "image_url": "string | null",
+      "is_active": "boolean",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+---
+
+## GET `api/menu/items/:id`
+Ruta pública. Obtiene un ítem por su ID.
+
+**Respuesta exitosa `200`:**
+```json
+{ "item": { /* mismo shape que arriba */ }}
+```
+
+**Errores:**
+- `404` - ítem no encontrado
+
+---
+
+## GET `api/menu/categories/:id/items`
+Ruta pública. Lista los ítems de una categoría específica.
+
+**Query params:**
+- `onlyActive` (opcional) - `true`para mostrar solo ítems activos
+
+**Respuesta exitosa `200`:**
+```json
+{ "items": [ /* array de items */ ]}
+```
+**Errores:**
+- `404` - Categoría no encontrada
+
+---
+
+## POST `api/menu/items`
+Requiere autenticación + rol `administrador`. Crea un nuevo ítem con imagen opcional.
+
+**Body (multipart/form-data)**
+| Campo | Tipo | Requerido |
+|-------|------|-----------|
+| `category_id` | string (uuid) | Sí |
+| `name` | string | Sí |
+| `description` | string | No |
+| `price` | number | Sí |
+| `image` | file | No |
+
+**Formatos de imagen aceptados: JPEG, PNG, WebP (máx. 5MB)**
+
+**Respuesta exitosa `201`:**
+```json
+{
+  "result": { /*item creado*/ }
+}
+```
+
+**Errores:**
+
+- `400` - Campos obligatorios faltantes, precio negativo, o categoría inactiva
+- `401` - No autenticado
+- `403` - Rol distinto a administrador
+- `404` - Categoría no encontrada
+
+---
+
+## PUT `api/menu/items/:id`
+Requiere autenticación + rol `administrador`. Actualiza un ítem existente con imagen opcional. Si se envía una nueva imagen, la anterior se elimina de Cloudinary.
+
+**Body (multipart/form-data, todos opcionales):**
+| Campo | Tipo |
+|-------|------|
+| category_id | string (uuid) |
+| name | string |
+| description | string |
+| price | number |
+| is_active | boolean |
+| image | file |
+
+**Formatos de imagen aceptados: JPEG, PNG, WebP (máx. 5MB)**
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "result": { /* item actualizado */ }
+}
+```
+
+**Errores:**
+
+- `400` - Precio negativo, o categoría no encontrada
+- `401` - No autenticado
+- `403` - Rol distinto a administrador
+- `404` - ítem no encontrado
+
+---
+
+## PATCH `api/menu/items/:id/toggle`
+Requiere autenticación + rol `administrador`. Activa o desactiva un ítem.
+
+**Body:** ninguno
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "message": "Ítem activado correctamente",
+  "item": { /* item actualizado*/ }
+}
+```
+
+**Errores:**
+
+- `401` - No autenticado
+- `403` - Rol distinto a administrador
+- `404` - ítem no encontrado 
