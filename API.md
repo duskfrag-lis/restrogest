@@ -619,3 +619,96 @@ Requiere autenticación + rol `administrador`. Activa o desactiva un ítem.
 - `401` - No autenticado
 - `403` - Rol distinto a administrador
 - `404` - ítem no encontrado 
+
+---
+
+### Perfil - `/api/profile`
+
+Todos los endpoinst requieren autenticación. El `id` del usuario se obtiene del token JWT - un usuario solo puede gestionar sus propio perfil.
+
+---
+
+## GET `api/profile`
+Requiere autenticación. Devuelve el perfil del usuario autenticado.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "user": {
+    "id": "uuid",
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "phone": "string | null",
+    "photo_url": "string |null",
+    "provider": "local | google",
+    "email_verified": "boolean",
+    "is_active": "boolean",
+    "created_at": "timestamp",
+    "role": "string"
+  }
+}
+```
+
+**Errores:**
+- `401` - No autenticado
+
+---
+
+### PUT `/api/profile`
+Requiere autenticación. Actualiza los datos personales del usuario. Acepta imagen de perfil opcional.
+
+**Body (multipart/form-data, todos opcionales):**
+| Campo | Tipo |
+|---|---|
+| first_name | string |
+| last_name | string |
+| phone | string |
+| image | file (JPEG, PNG, WebP, máx. 5MB) |
+
+**Respuesta exitosa `200`:**
+```json
+{ "user": { /* perfil actualizado */ } }
+```
+
+**Errores:**
+- `401` — No autenticado
+- `404` — Usuario no encontrado
+
+---
+
+### PATCH `/api/profile/change-password`
+Requiere autenticación. Cambia la contraseña del usuario validando la actual primero.
+
+**Body:**
+```json
+{
+  "currentPassword": "string (requerido)",
+  "newPassword": "string (requerido, mín. 8 caracteres)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Contraseña actualizada correctamente" }
+```
+
+**Errores:**
+- `400` — Campos faltantes o nueva contraseña muy corta
+- `401` — No autenticado o contraseña actual incorrecta
+- `404` — Usuario no encontrado
+
+---
+
+### DELETE `/api/profile`
+Requiere autenticación. Elimina la cuenta del usuario (soft delete). La sesión se cierra inmediatamente. Los administradores no pueden eliminar su propia cuenta.
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Cuenta eliminada correctamente" }
+```
+
+**Errores:**
+- `401` — No autenticado
+- `403` — El usuario es administrador
+- `404` — Usuario no encontrado
