@@ -1,0 +1,1 @@
+ALTER TABLE restaurant_tables RENAME COLUMN update_at TO updated_at;
