@@ -712,3 +712,124 @@ Requiere autenticación. Elimina la cuenta del usuario (soft delete). La sesión
 - `401` — No autenticado
 - `403` — El usuario es administrador
 - `404` — Usuario no encontrado
+
+---
+
+## Tables — `/api/tables`
+
+### GET `/api/tables`
+Ruta pública. Lista todas las mesas con su estado actual.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "tables": [
+    {
+      "id": "uuid",
+      "number": "number",
+      "capacity": "number",
+      "status": "disponible | ocupada | reservada | en_limpieza",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/tables/:id`
+Ruta pública. Obtiene una mesa por su ID.
+
+**Respuesta exitosa `200`:**
+```json
+{ "table": { /* mismo shape que arriba */ } }
+```
+
+**Errores:**
+- `404` — Mesa no encontrada
+
+---
+
+### POST `/api/tables`
+Requiere autenticación + rol `administrador`. Crea una nueva mesa.
+
+**Body:**
+```json
+{
+  "number": "number (requerido, único)",
+  "capacity": "number (requerido, mín. 1)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{ "table": { /* mesa creada */ } }
+```
+
+**Errores:**
+- `400` — Campos faltantes o capacidad inválida
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `409` — Ya existe una mesa con ese número
+
+---
+
+### PUT `/api/tables/:id`
+Requiere autenticación + rol `administrador`. Actualiza número y/o capacidad de una mesa.
+
+**Body (todos opcionales):**
+```json
+{
+  "number": "number",
+  "capacity": "number"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "table": { /* mesa actualizada */ } }
+```
+
+**Errores:**
+- `400` — Capacidad inválida
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Mesa no encontrada
+- `409` — Ya existe una mesa con ese número
+
+---
+
+### PATCH `/api/tables/:id/status`
+Requiere autenticación + rol `administrador` o `mesero`. Cambia el estado de una mesa. Una mesa en estado `reservada` no puede pasar directamente a `ocupada`.
+
+**Body:**
+```json
+{ "status": "disponible | ocupada | reservada | en_limpieza" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "table": { /* mesa con nuevo estado */ } }
+```
+
+**Errores:**
+- `400` — Estado inválido o transición no permitida (reservada → ocupada)
+- `401` — No autenticado
+- `403` — Rol no permitido
+- `404` — Mesa no encontrada
+
+---
+
+### DELETE `/api/tables/:id`
+Requiere autenticación + rol `administrador`. Elimina una mesa. Solo se pueden eliminar mesas en estado `disponible`.
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Mesa eliminada correctamente" }
+```
+
+**Errores:**
+- `400` — La mesa no está disponible
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Mesa no encontrada
