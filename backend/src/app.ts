@@ -9,6 +9,7 @@ import usersRouter from './modules/users/users.routes';
 import passport from './config/passport';
 import menuRoutes from './modules/menu/menu.routes';
 import profileRoutes from './modules/profile/profile.routes';
+import tablesRoutes from './modules/tables/tables.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -25,6 +26,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRouter);
 app.use('/api/menu', menuRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('api/tables', tablesRoutes);
+
 
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', project: 'RestroGest' });
