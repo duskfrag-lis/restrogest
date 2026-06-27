@@ -72,7 +72,7 @@ const tablesService = {
             throw { status: 400, message: 'Una mesa reservada no puede pasar directamente a ocupada. Debe ser atendida primero.' };
         }
 
-        return await tablesRepository.updatedStatus(id, status);
+        return await tablesRepository.updateStatus(id, status);
     },
 
     async deleteTable(id: string) {

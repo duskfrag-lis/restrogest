@@ -58,11 +58,11 @@ const tablesRepository = {
         return rows[0] || null;
     },
 
-    async updatedStatus(id: string, status: string) {
+    async updateStatus(id: string, status: string) {
 
         const { rows } = await pool.query(
 
-            `UPDATED restaurant_tables SET status = $1, updated_at = NOW()
+            `UPDATE restaurant_tables SET status = $1, updated_at = NOW()
             WHERE id = $2
             RETURNING *`,
             [status, id]
