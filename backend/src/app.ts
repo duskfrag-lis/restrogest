@@ -26,7 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRouter);
 app.use('/api/menu', menuRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('api/tables', tablesRoutes);
+app.use('/api/tables', tablesRoutes);
 
 
 app.get('/health', (_req, res) => {
