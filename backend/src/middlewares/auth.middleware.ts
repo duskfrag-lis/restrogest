@@ -23,12 +23,12 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         const decoded = jwt.verify(token, SECRET) as { id: string; email: string; role: string };
         
         const { rows } = await pool.query(
-            'SELECT is_active FROM users WHERE id = $1', [decoded.id]
+            'SELECT is_active, deleted_at FROM users WHERE id = $1', [decoded.id]
         );
 
         const user = rows[0];
 
-        if (!user || !user.is_active) {
+        if (!user || !user.is_active || user.deleted_at) {
             return res.status(401).json({ message: 'Tu sesión ya no es válida. Inicia sesión nuevamente.' });
         }
 
