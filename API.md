@@ -833,3 +833,176 @@ Requiere autenticación + rol `administrador`. Elimina una mesa. Solo se pueden 
 - `401` — No autenticado
 - `403` — Rol distinto a administrador
 - `404` — Mesa no encontrada
+
+---
+
+## Orders — `/api/orders`
+
+Todos los endpoints requieren autenticación.
+
+### GET `/api/orders`
+Requiere autenticación + rol `mesero` o `administrador`. Lista todos los pedidos.
+
+**Query params:**
+- `status` (opcional) — filtra por estado (`pendiente`, `en_preparacion`, `listo`, `entregado`, `cerrado`, `cancelado`)
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "orders": [
+    {
+      "id": "uuid",
+      "table_id": "uuid",
+      "waiter_id": "uuid",
+      "type": "mesa | domicilio",
+      "status": "string",
+      "total": "number",
+      "table_number": "number",
+      "waiter_first_name": "string",
+      "waiter_last_name": "string",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/orders/:id`
+Requiere autenticación + rol `mesero` o `administrador`. Obtiene un pedido con sus ítems.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "order": {
+    /* datos del pedido */
+    "items": [
+      {
+        "id": "uuid",
+        "menu_item_id": "uuid",
+        "item_name": "string",
+        "quantity": "number",
+        "unit_price": "number",
+        "notes": "string | null",
+        "status": "pendiente | en_preparacion | listo"
+      }
+    ]
+  }
+}
+```
+
+**Errores:**
+- `404` — Pedido no encontrado
+
+---
+
+### GET `/api/orders/table/:tableId`
+Requiere autenticación + rol `mesero` o `administrador`. Lista los pedidos activos de una mesa.
+
+**Errores:**
+- `404` — Mesa no encontrada
+
+---
+
+### POST `/api/orders`
+Requiere autenticación + rol `mesero` o `administrador`. Abre un nuevo pedido en mesa. Si la mesa estaba disponible, pasa automáticamente a ocupada.
+
+**Body:**
+```json
+{ "table_id": "uuid (requerido)" }
+```
+
+**Respuesta exitosa `201`:**
+```json
+{ "order": { /* pedido creado */ } }
+```
+
+**Errores:**
+- `400` — Mesa en estado no permitido (reservada o en_limpieza)
+- `404` — Mesa no encontrada
+
+---
+
+### POST `/api/orders/:id/items`
+Requiere autenticación + rol `mesero` o `administrador`. Agrega un ítem al pedido. Solo funciona si el pedido está en estado `pendiente`.
+
+**Body:**
+```json
+{
+  "menu_item_id": "uuid (requerido)",
+  "quantity": "number (requerido)",
+  "notes": "string (opcional)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{ "item": { /* ítem agregado con precio al momento del pedido */ } }
+```
+
+**Errores:**
+- `400` — Pedido ya enviado a cocina, ítem inactivo, o campos faltantes
+- `404` — Pedido o ítem del menú no encontrado
+
+---
+
+### DELETE `/api/orders/:id/items/:itemId`
+Requiere autenticación + rol `mesero` o `administrador`. Elimina un ítem del pedido. Solo funciona si el pedido está en estado `pendiente`.
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Ítem eliminado del pedido" }
+```
+
+**Errores:**
+- `400` — Pedido ya enviado a cocina
+- `404` — Pedido no encontrado
+
+---
+
+### PATCH `/api/orders/:id/send-to-kitchen`
+Requiere autenticación + rol `mesero` o `administrador`. Envía el pedido a cocina — cambia el estado de `pendiente` a `en_preparacion`. El pedido ya no puede modificarse después de esto.
+
+**Respuesta exitosa `200`:**
+```json
+{ "order": { /* pedido actualizado */ } }
+```
+
+**Errores:**
+- `400` — Pedido ya enviado o sin ítems
+- `404` — Pedido no encontrado
+
+---
+
+### PATCH `/api/orders/:id/status`
+Requiere autenticación + rol `mesero`, `cocinero`, `jefe_cocina` o `administrador`. Cambia el estado del pedido siguiendo las transiciones válidas.
+
+**Transiciones válidas:**
+pendiente → en_preparacion | cancelado
+
+en_preparacion → listo | cancelado
+
+listo → entregado
+
+entregado → cerrado
+
+**Reglas:**
+- Solo el administrador puede cancelar un pedido
+- Solo el mesero o administrador pueden cerrar un pedido
+- Al cerrar un pedido, la mesa vuelve automáticamente a `disponible`
+
+**Body:**
+```json
+{ "status": "string (requerido)" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "order": { /* pedido con nuevo estado */ } }
+```
+
+**Errores:**
+- `400` — Transición de estado no permitida
+- `403` — Rol no permitido para esa transición
+- `404` — Pedido no encontrado
