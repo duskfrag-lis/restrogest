@@ -2,6 +2,7 @@ import ordersRepository from "./orders.repository";
 import tablesRepository from "../tables/tables.repository";
 import menuRepository from "../menu/menu.repository";
 import pool from "../../config/db";
+import { getIO } from "../../config/socket";
 
 const ordersService = {
 
@@ -118,8 +119,8 @@ const ordersService = {
 
         const updated = await ordersRepository.updateStatus(orderId, 'en_preparacion');
 
-        //TODO: emitir evento Socket.io cuando se implemente el modulo de cocina
-        // oi.emit('new_order', updated);
+        const io = getIO();
+        io.to('kitchen').emit('new_order', { ...updated, items });
 
         return updated;
     },
