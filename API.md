@@ -1006,3 +1006,97 @@ entregado → cerrado
 - `400` — Transición de estado no permitida
 - `403` — Rol no permitido para esa transición
 - `404` — Pedido no encontrado
+
+---
+
+## Kitchen — `/api/kitchen`
+
+Todos los endpoints requieren autenticación. Roles permitidos: `cocinero`, `jefe_cocina`, `administrador`.
+
+### GET `/api/kitchen`
+Lista todos los pedidos activos en cocina (estados `pendiente` y `en_preparacion`), con sus ítems.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "orders": [
+    {
+      "id": "uuid",
+      "status": "pendiente | en_preparacion",
+      "table_number": "number",
+      "waiter_first_name": "string",
+      "waiter_last_name": "string",
+      "created_at": "timestamp",
+      "items": [
+        {
+          "id": "uuid",
+          "item_name": "string",
+          "quantity": "number",
+          "notes": "string | null",
+          "status": "pendiente | en_preparacion | listo"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/kitchen/:id`
+Obtiene un pedido específico con todos sus ítems.
+
+**Errores:**
+- `404` — Pedido no encontrado
+
+---
+
+### PATCH `/api/kitchen/:id/items/:itemId/status`
+Cambia el estado de un ítem específico. Si todos los ítems pasan a `listo`, el pedido se marca automáticamente como `listo` y se notifica al mesero via Socket.io.
+
+**Body:**
+```json
+{ "status": "pendiente | en_preparacion | listo" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "item": { /* ítem actualizado */ } }
+```
+
+**Errores:**
+- `400` — Estado inválido
+- `404` — Pedido o ítem no encontrado
+
+---
+
+### PATCH `/api/kitchen/:id/ready`
+Marca todos los ítems y el pedido completo como `listo` de una sola vez. Notifica al mesero via Socket.io.
+
+**Respuesta exitosa `200`:**
+```json
+{ "order": { /* pedido actualizado */ } }
+```
+
+**Errores:**
+- `400` — Pedido no está en preparación
+- `404` — Pedido no encontrado
+
+---
+
+## Eventos Socket.io
+
+El servidor emite estos eventos en tiempo real:
+
+| Evento | Sala | Descripción |
+|---|---|---|
+| `new_order` | `kitchen` | Nuevo pedido enviado a cocina |
+| `item_status_updated` | `kitchen` | Estado de un ítem actualizado |
+| `order_ready` | `kitchen` | Pedido marcado como listo |
+| `order_ready` | `waiter_{id}` | Notificación al mesero del pedido listo |
+
+**Para conectarse a una sala desde el frontend:**
+```javascript
+socket.emit('join_kitchen');         // cocinero/jefe_cocina
+socket.emit('join_waiter', userId);  // mesero
+```
