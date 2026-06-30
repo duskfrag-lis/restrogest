@@ -1100,3 +1100,137 @@ El servidor emite estos eventos en tiempo real:
 socket.emit('join_kitchen');         // cocinero/jefe_cocina
 socket.emit('join_waiter', userId);  // mesero
 ```
+
+---
+
+## Delivery — `/api/delivery`
+
+### GET `/api/delivery/coverage`
+Ruta pública. Obtiene la zona de cobertura configurada del restaurante.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "zones": {
+    "type": "radius",
+    "center_lat": "number",
+    "center_lng": "number",
+    "radius_km": "number"
+  }
+}
+```
+
+**Errores:**
+- `404` — No hay zonas configuradas
+
+---
+
+### PUT `/api/delivery/coverage`
+Requiere autenticación + rol `administrador`. Configura la zona de cobertura del restaurante.
+
+**Body:**
+```json
+{
+  "type": "radius",
+  "center_lat": "number (requerido)",
+  "center_lng": "number (requerido)",
+  "radius_km": "number (requerido, mayor a 0)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Zona de cobertura actualizada correctamente" }
+```
+
+---
+
+### GET `/api/delivery`
+Requiere autenticación + rol `administrador`. Lista todos los pedidos a domicilio.
+
+**Query params:**
+- `status` (opcional) — filtra por estado (`recibido`, `en_preparacion`, `en_camino`, `entregado`)
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "deliveries": [
+    {
+      "id": "uuid",
+      "order_id": "uuid",
+      "client_id": "uuid",
+      "deliverer_id": "uuid | null",
+      "address": "string",
+      "phone": "string",
+      "status": "string",
+      "payment_method": "string",
+      "payment_status": "string",
+      "client_lat": "number",
+      "client_lng": "number",
+      "client_first_name": "string",
+      "client_last_name": "string",
+      "deliverer_first_name": "string | null",
+      "deliverer_last_name": "string | null",
+      "total": "number",
+      "created_at": "timestamp"
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/delivery/my`
+Requiere autenticación + rol `cliente`. Lista los pedidos a domicilio del cliente autenticado.
+
+**Respuesta exitosa `200`:**
+```json
+{ "deliveries": [ /* array de domicilios */ ] }
+```
+
+---
+
+### GET `/api/delivery/:id`
+Requiere autenticación + rol `cliente`, `domiciliario` o `administrador`. Obtiene un pedido a domicilio por su ID.
+
+**Errores:**
+- `404` — Pedido no encontrado
+
+---
+
+### POST `/api/delivery`
+Requiere autenticación + rol `cliente`. Crea un pedido a domicilio. Valida que la ubicación esté dentro de la zona de cobertura usando la fórmula de Haversine.
+
+**Body:**
+```json
+{
+  "items": [
+    {
+      "menu_item_id": "uuid (requerido)",
+      "quantity": "number (requerido)",
+      "notes": "string (opcional)"
+    }
+  ],
+  "address": "string (requerido)",
+  "phone": "string (requerido)",
+  "payment_method": "efectivo | tarjeta | pse | contra_entrega (requerido)",
+  "client_lat": "number (requerido)",
+  "client_lng": "number (requerido)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{ "delivery": { /* pedido a domicilio creado */ } }
+```
+
+**Errores:**
+- `400` — Campos faltantes, método de pago inválido, ubicación fuera de cobertura, o sin ítems
+- `404` — Ítem del menú no encontrado o inactivo
+
+---
+
+### PATCH `/api/delivery/:id/status`
+Requiere autenticación + rol `domiciliario` o `administrador`. Cambia el estado del pedido.
+
+**Transiciones válidas:**
