@@ -14,6 +14,7 @@ import profileRoutes from './modules/profile/profile.routes';
 import tablesRoutes from './modules/tables/tables.routes';
 import ordersRoutes from './modules/orders/orders.routes';
 import kitchenRoutes from './modules/kitchen/kitchen.routes';
+import deliveryRoutes from './modules/delivery/delivery.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -37,6 +38,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/tables', tablesRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/kitchen', kitchenRoutes);
+app.use('/api/delivery', deliveryRoutes);
 
 
 app.get('/health', (_req, res) => {
