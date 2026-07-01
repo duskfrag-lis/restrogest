@@ -141,6 +141,56 @@ const emailService = {
             `,
         });
     },
+
+    async sendReservationConfirmation(to: string, name: string, data: {
+
+        date: string;
+        time: string;
+        party_size: number;
+        table_number: number;
+
+    }) {
+
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to,
+            subject: `${APP_NAME} - Confirmación de reserva`,
+            html: `
+            
+            <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #f8f6f4; padding: 32px; border-radius: 8px;">
+
+                <div style="margin-bottom: 24px;">
+                    <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #d9232e; letter-spacing: 0.6rem;">
+                        RestroGest
+                    </span>
+
+                    <h2 style="margin: 8px 0 0; font-size: 26px; font-weight: 850; color: #2c2526; line.height: 1.1;">
+                        ¡Reserva confirmada!
+                    </h2>
+                </div>
+
+                <p style="color: #6f6264; font-size: 15px; line_height: 1.6;">
+                    Hola <strong style="color: #2c2526;">${name}</strong>,
+                </p>
+
+                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">Tu reserva ha sido confirmada con los siguientes detalles: </p>}
+
+                <div style="background: #ffff; border-radius: 8px; padding: 16px; margin: 16px 0; border: 1px solid #e7dcda;">
+
+                    <p style="margin: 0; color: #2c2526;"><strong>Fecha:</strong> ${data.date}</p>
+                    <p style="margin: 8px 0 0; color: #2c2526;"><strong>Hora:</strong> ${data.time}</p>
+                    <p style="margin: 8px 0 0; color: #2c2526;"><strong>Personas:</strong> ${data.party_size}</p>
+                    <p style="margin: 8px 0 0; color: #2c2526;"><strong>Mesa:</strong> ${data.table_number}</p>
+                
+                </div>
+
+                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">Recuerda que puedes cancelar tu reserva hasta 1 hora antes de la hora asignada.</p>
+                <p style="color: #8a7a7d; font-size: 13px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e7dcda;">Si no esperabas este correo, ignóralo.</p>
+            
+            </div>
+            `,
+        });
+    },
 };
 
 export default emailService;
