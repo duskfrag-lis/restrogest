@@ -1234,3 +1234,174 @@ Requiere autenticación + rol `cliente`. Crea un pedido a domicilio. Valida que 
 Requiere autenticación + rol `domiciliario` o `administrador`. Cambia el estado del pedido.
 
 **Transiciones válidas:**
+recibido -> en_preparacion
+en_preparacion -> en_camino
+en_camino -> entregado
+
+**Reglas:**
+- `en_camino` — domiciliario o administrador
+- `entregado` — domiciliario o administrador
+
+**Body:**
+```json
+{ "status": "string (requerido)" }
+```
+
+**Errores:**
+- `400` — Estado inválido o transición no permitida
+- `403` — Rol no permitido para esa transición
+- `404` — Pedido no encontrado
+
+---
+
+### PATCH `/api/delivery/:id/assign`
+Requiere autenticación + rol `administrador`. Asigna un domiciliario a un pedido.
+
+**Body:**
+```json
+{ "deliverer_id": "uuid (requerido)" }
+```
+
+**Respuesta exitosa `200`:**
+```json
+{ "delivery": { /* pedido actualizado con domiciliario */ } }
+```
+
+**Errores:**
+- `400` — El usuario no existe o no tiene rol de domiciliario
+- `404` — Pedido no encontrado
+
+---
+
+## Reservations — `/api/reservations`
+
+### GET `/api/reservations/available`
+Ruta pública. Lista las mesas disponibles para una fecha y número de personas específicos.
+
+**Query params:**
+- `reserved_at` (requerido) — fecha y hora en formato ISO (`2026-07-15T19:00:00`)
+- `party_size` (requerido) — número de personas
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "tables": [
+    {
+      "id": "uuid",
+      "number": "number",
+      "capacity": "number",
+      "status": "string"
+    }
+  ]
+}
+```
+
+**Errores:**
+- `400` — Fecha inválida o menos de 2 horas de anticipación
+
+---
+
+### GET `/api/reservations/today`
+🔒 Requiere autenticación + rol `mesero` o `administrador`. Lista las reservas confirmadas del día en orden cronológico.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "reservations": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "table_id": "uuid",
+      "reserved_at": "timestamp",
+      "party_size": "number",
+      "status": "confirmada",
+      "notes": "string | null",
+      "first_name": "string",
+      "last_name": "string",
+      "email": "string",
+      "table_number": "number",
+      "capacity": "number"
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/reservations/my`
+Requiere autenticación + rol `cliente`. Lista las reservas del cliente autenticado.
+
+**Respuesta exitosa `200`:**
+```json
+{ "reservations": [ /* array de reservas */ ] }
+```
+
+---
+
+### GET `/api/reservations`
+Requiere autenticación + rol `administrador`. Lista todas las reservas del sistema.
+
+---
+
+### GET `/api/reservations/:id`
+Requiere autenticación + rol `cliente`, `mesero` o `administrador`. Obtiene una reserva por su ID.
+
+**Errores:**
+- `404` — Reserva no encontrada
+
+---
+
+### POST `/api/reservations`
+Requiere autenticación + rol `cliente`. Crea una reserva. Envía confirmación por correo automáticamente.
+
+**Body:**
+```json
+{
+  "table_id": "uuid (requerido)",
+  "reserved_at": "string ISO (requerido)",
+  "party_size": "number (requerido)",
+  "notes": "string (opcional)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{ "reservation": { /* reserva creada */ } }
+```
+
+**Errores:**
+- `400` — Campos faltantes, menos de 2h de anticipación, capacidad insuficiente, o mesa no disponible
+- `404` — Mesa no encontrada
+
+---
+
+### PATCH `/api/reservations/:id/cancel`
+Requiere autenticación + rol `cliente` o `administrador`. Cancela una reserva.
+
+**Reglas:**
+- El cliente solo puede cancelar sus propias reservas y con mínimo 1 hora de anticipación
+- El administrador puede cancelar cualquier reserva en cualquier momento
+
+**Respuesta exitosa `200`:**
+```json
+{ "reservation": { /* reserva cancelada */ } }
+```
+
+**Errores:**
+- `400` — Reserva ya cancelada o menos de 1h de anticipación
+- `403` — El cliente intenta cancelar una reserva que no es suya
+- `404` — Reserva no encontrada
+
+---
+
+### PATCH `/api/reservations/:id/no-show`
+Requiere autenticación + rol `mesero` o `administrador`. Marca una reserva como no presentado y libera la mesa automáticamente. Solo disponible después de 15 minutos de la hora reservada.
+
+**Respuesta exitosa `200`:**
+```json
+{ "message": "Reserva marcada como no presentado y mesa liberada" }
+```
+
+**Errores:**
+- `400` — Reserva no confirmada o aún no han pasado 15 minutos
+- `404` — Reserva no encontrada
