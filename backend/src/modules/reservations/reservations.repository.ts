@@ -67,7 +67,7 @@ const reservationsRepository = {
 
         const { rows } = await pool.query(
 
-            `SELECT rt.*, FROM restaurant_tables rt
+            `SELECT rt.* FROM restaurant_tables rt
             WHERE rt.capacity >= $1
             AND rt.status = 'disponible'
             AND rt.id NOT IN (
