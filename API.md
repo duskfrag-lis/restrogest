@@ -1302,7 +1302,7 @@ Ruta pública. Lista las mesas disponibles para una fecha y número de personas 
 ---
 
 ### GET `/api/reservations/today`
-🔒 Requiere autenticación + rol `mesero` o `administrador`. Lista las reservas confirmadas del día en orden cronológico.
+Requiere autenticación + rol `mesero` o `administrador`. Lista las reservas confirmadas del día en orden cronológico.
 
 **Respuesta exitosa `200`:**
 ```json
@@ -1405,3 +1405,230 @@ Requiere autenticación + rol `mesero` o `administrador`. Marca una reserva como
 **Errores:**
 - `400` — Reserva no confirmada o aún no han pasado 15 minutos
 - `404` — Reserva no encontrada
+
+## Inventory — `/api/inventory`
+
+### GET `/api/inventory/low-stock`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista los ítems cuya cantidad está en o por debajo de su umbral mínimo.
+
+Respuesta exitosa `200`:
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "string",
+      "quantity": "number",
+      "unit": "string",
+      "min_threshold": "number",
+      "expiry_date": "date | null",
+      "is_low_stock": "boolean",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+### GET `/api/inventory/expiring-soon`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista los ítems que vencen dentro de los próximos 7 días (o el número de días indicado).
+
+Query params:
+- `days` (opcional) — número de días hacia adelante para considerar. Default: `7`
+
+Respuesta exitosa `200`:
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "string",
+      "quantity": "number",
+      "unit": "string",
+      "min_threshold": "number",
+      "expiry_date": "date",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+### GET `/api/inventory/expired`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista los ítems cuya fecha de vencimiento ya pasó.
+
+Respuesta exitosa `200`:
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "string",
+      "quantity": "number",
+      "unit": "string",
+      "min_threshold": "number",
+      "expiry_date": "date",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+### GET `/api/inventory/alerts`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Devuelve un resumen consolidado de alertas: ítems con bajo stock, próximos a vencer y vencidos.
+
+Respuesta exitosa `200`:
+```json
+{
+  "alerts": {
+    "low_stock": [ /* array de ítems */ ],
+    "expiring_soon": [ /* array de ítems */ ],
+    "expired": [ /* array de ítems */ ],
+    "total": "number"
+  }
+}
+```
+
+### GET `/api/inventory/movements`
+Requiere autenticación + rol `administrador`. Lista el historial completo de movimientos de inventario de todos los ítems.
+
+Respuesta exitosa `200`:
+```json
+{
+  "movements": [
+    {
+      "id": "uuid",
+      "item_id": "uuid",
+      "quantity_change": "number",
+      "reason": "string | null",
+      "change_by": "uuid",
+      "created_at": "timestamp",
+      "first_name": "string",
+      "last_name": "string",
+      "item_name": "string"
+    }
+  ]
+}
+```
+
+### GET `/api/inventory`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista todos los ítems de inventario.
+
+Respuesta exitosa `200`:
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "string",
+      "quantity": "number",
+      "unit": "string",
+      "min_threshold": "number",
+      "expiry_date": "date | null",
+      "is_low_stock": "boolean",
+      "is_expired": "boolean",
+      "expires_soon": "boolean",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ]
+}
+```
+
+### POST `/api/inventory`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Crea un nuevo ítem de inventario.
+
+Body:
+```json
+{
+  "name": "string (requerido)",
+  "quantity": "number (requerido)",
+  "unit": "string (requerido)",
+  "min_threshold": "number (requerido)",
+  "expiry_date": "string ISO (opcional)"
+}
+```
+
+Respuesta exitosa `201`:
+```json
+{ "message": "ítem de inventario creado exitosamente", "item": { /* ítem creado */ } }
+```
+
+Errores:
+- `400` — Nombre, cantidad, unidad o umbral mínimo faltantes o inválidos
+- `409` — Ya existe un ítem con ese nombre
+
+### GET `/api/inventory/:id`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Obtiene un ítem de inventario por su ID.
+
+Errores:
+- `404` — Ítem de inventario no encontrado
+
+### PUT `/api/inventory/:id`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Actualiza los datos de un ítem (nombre, unidad, umbral mínimo, fecha de vencimiento). No permite modificar la cantidad directamente.
+
+Body:
+```json
+{
+  "name": "string (opcional)",
+  "unit": "string (opcional)",
+  "min_threshold": "number (opcional)",
+  "expiry_date": "string ISO (opcional)"
+}
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Ítem de inventario actualizado exitosamente", "item": { /* ítem actualizado */ } }
+```
+
+Errores:
+- `400` — Nombre excede 150 caracteres, o umbral mínimo negativo
+- `404` — Ítem de inventario no encontrado
+- `409` — Ya existe un ítem con ese nombre
+
+### PATCH `/api/inventory/:id/quantity`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Actualiza manualmente la cantidad de un ítem. Cada cambio queda registrado en el historial de movimientos.
+
+Body:
+```json
+{
+  "quantity": "number (requerido)",
+  "reason": "string (opcional)"
+}
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Cantidad actualizada exitosamente", "item": { /* ítem con cantidad actualizada */ } }
+```
+
+Errores:
+- `400` — Cantidad faltante o negativa
+- `401` — Usuario no autenticado
+- `404` — Ítem de inventario no encontrado
+
+### GET `/api/inventory/:id/movements`
+Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista el historial de movimientos de un ítem específico.
+
+Respuesta exitosa `200`:
+```json
+{
+  "movements": [
+    {
+      "id": "uuid",
+      "item_id": "uuid",
+      "quantity_change": "number",
+      "reason": "string | null",
+      "change_by": "uuid",
+      "created_at": "timestamp",
+      "first_name": "string",
+      "last_name": "string"
+    }
+  ]
+}
+```
+
+Errores:
+- `404` — Ítem de inventario no encontrado
