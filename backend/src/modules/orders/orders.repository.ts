@@ -49,7 +49,7 @@ const ordersRepository = {
 
             `SELECT oi.*, mi.name as item_name, mi.description as item_description
             FROM order_items oi
-            JOIN menu_items mi ON mi.id = oi.menu_items_id
+            JOIN menu_item mi ON mi.id = oi.menu_items_id
             WHERE oi.order_id = $1`,
 
             [orderId]
@@ -63,7 +63,7 @@ const ordersRepository = {
         const { rows } = await pool.query(
 
             `SELECT * FROM orders
-            WHERE table_is = $1 AND status NOT IN ('cerrado', 'cancelado')
+            WHERE table_id = $1 AND status NOT IN ('cerrado', 'cancelado')
             ORDER BY created_at DESC`,
 
             
@@ -80,7 +80,7 @@ const ordersRepository = {
             `INSERT INTO orders (table_id, waiter_id, type) VALUES ($1, $2, $3)
             RETURNING *`,
 
-            [data.table_id, data.waiter_id, data.type]
+            [data.table_id, data.waiter_id, data.type || 'mesa']
         );
 
         return rows[0];
@@ -130,7 +130,7 @@ const ordersRepository = {
 
         const { rows } = await pool.query(
 
-            `UPDATE orders SET status = 1, updated_at = NOW()
+            `UPDATE orders SET status = $1, updated_at = NOW()
             WHERE id = $2 RETURNING *`,
 
             [status, id]
@@ -146,7 +146,7 @@ const ordersRepository = {
             `UPDATE orders SET total = (
                 SELECT COALESCE(SUM(quantity * unit_price), 0)
                 FROM order_items
-                WHERE orde_id = $1
+                WHERE order_id = $1
             ),
             updated_at = NOW()
             WHERE id = $1

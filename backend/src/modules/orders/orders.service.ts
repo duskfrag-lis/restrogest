@@ -91,7 +91,7 @@ const ordersService = {
 
         if (!order) throw { status: 404, message: 'Pedido no encontrado' };
 
-        if (order.statys !== 'pendiente') {
+        if (order.status !== 'pendiente') {
             throw { status: 400, message: 'No se pueden quitar ítems a un pedido ya enviado a cocina' };
         }
 
