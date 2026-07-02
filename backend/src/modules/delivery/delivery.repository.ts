@@ -17,14 +17,14 @@ const deliveryRepository = {
         WHERE do2.status = $1
         ORDER BY do2.created_at DESC`
 
-        : `SELECT do2.*.
+        : `SELECT do2.*,
             u1.first_name as client_first_name, u1.last_name as client_last_name,
             u2.first_name as deliverer_first_name, u2.last_name as deliverer_last_name,
-            o.toral
+            o.total
         FROM delivery_orders do2
         JOIN orders o ON o.id = do2.order_id
         JOIN users u1 ON u1.id = do2.client_id
-        LEFT JOIN users u2 ON u2.id = do2.delivery_id
+        LEFT JOIN users u2 ON u2.id = do2.deliverer_id
         ORDER BY do2.created_at DESC`;
 
         const { rows } = status ? await pool.query(query, [status]) : await pool.query(query);
@@ -52,7 +52,7 @@ const deliveryRepository = {
         return rows[0] || null;
     },
 
-    async findByCliientId(clientId: string) {
+    async findByClientId(clientId: string) {
 
         const { rows } = await pool.query(
 
@@ -120,21 +120,21 @@ const deliveryRepository = {
         return rows[0] || null;
     },
 
-    async getConverageZones() {
+    async getCoverageZones() {
 
         const { rows } = await pool.query(
 
             `SELECT coverage_zones FROM restaurant_info LIMIT 1`
         );
 
-        return rows[0]?.converage_zones || null;
+        return rows[0]?.coverage_zones || null;
     },
 
     async updateCoverageZones(zones: object) {
 
         await pool.query(
 
-            `UPDATE restaurant_info SET converage_zones = $1, updated_at = NOW()`,
+            `UPDATE restaurant_info SET coverage_zones = $1, updated_at = NOW()`,
             [JSON.stringify(zones)]
         );
     },

@@ -41,12 +41,12 @@ const deliveryService = {
 
     async getMyDeliveries(clientId: string) {
 
-        return await deliveryRepository.findByCliientId(clientId);
+        return await deliveryRepository.findByClientId(clientId);
     },
 
     async validateConverage(lat: number, lng: number) {
 
-        const zones = await deliveryRepository.getConverageZones();
+        const zones = await deliveryRepository.getCoverageZones();
 
         if (!zones) {
             throw { status: 400, message: 'El restaurante no tiene zonas de cobertura configuradas' };
@@ -86,8 +86,8 @@ const deliveryService = {
 
         const { rows: ordersRows } = await pool.query(
 
-            `INSERT INTO orders (type, status, waiter_id)
-            VALUES ('domicilio', 'pendiente', $1) RETURNING *`,
+            `INSERT INTO orders (type, status)
+            VALUES ('domicilio', 'pendiente') RETURNING *`,
 
             [data.client_id]
         );
@@ -156,12 +156,21 @@ const deliveryService = {
             'entregado': [],
         };
 
-        if (VALID_TRANSITIONS[delivery.status]?.includes(status)) {
+        if (!VALID_TRANSITIONS[delivery.status]?.includes(status)) {
             throw { status: 400, message: `No se puede cambiar el estado de '${delivery.status}' a '${status}'`};
         }
 
         if (status === 'en_camino' && userRole !== 'administrador' && userRole !== 'domiciliario') {
             throw { status: 403, message: 'Solo el comiciliario o administrador pueden marcar un pedido como en camino'};
+        }
+
+        if (status === 'entregado') {
+
+            const canClose = delivery.payment_status === 'aprobado' || delivery.payment_method === 'contra_entrega';
+
+            if (!canClose) {
+                throw { status: 400, message: 'No se pueden marcar como entregado: el pago no está confirmado' };
+            }
         }
 
         if (status === 'entregado' && userRole !== 'domiciliario' && userRole !== 'administrador') {
@@ -194,7 +203,7 @@ const deliveryService = {
 
     async getCoverageZones() {
 
-        const zones = await deliveryRepository.getConverageZones();
+        const zones = await deliveryRepository.getCoverageZones();
 
         if (!zones) throw { status: 404, message: 'No hay zonas de cobertura configuradas' };
 
