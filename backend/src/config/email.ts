@@ -191,6 +191,58 @@ const emailService = {
             `,
         });
     },
+
+    async sendPaymentConfirmation(to: string, name: string, data: {
+
+        amount: number;
+        method: string;
+
+    }) {
+
+        const methodLabels: Record<string, string> = {
+            efectivo: 'Efectivo',
+            tarjeta: 'Tarjeta',
+            pse: 'PSE',
+            contra_entrega: 'Pago contra entrega',
+        };
+
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to,
+            subject: `${APP_NAME} - Confirmación de pago`,
+            html: `
+
+            <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #f8f6f4; padding: 32px; border-radius: 8px;">
+
+                <div style="margin-bottom: 24px;">
+                    <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #d9232e; letter-spacing: 0.06em;">
+                        RestroGest
+                    </span>
+
+                    <h2 style="margin: 8px 0 0; font-size: 26px; font-weight: 850; color: #2c2526; line-height: 1.1;">
+                        ¡Pago confirmado!
+                    </h2>
+                </div>
+
+                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">
+                    Hola <strong style="color: #2c2526;">${name}</strong>,
+                </p>
+
+                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">Hemos confirmado el pago de tu pedido con los siguientes detalles:</p>
+
+                <div style="background: #ffff; border-radius: 8px; padding: 16px; margin: 16px 0; border: 1px solid #e7dcda;">
+
+                    <p style="margin: 0; color: #2c2526;"><strong>Monto:</strong> $${Number(data.amount).toLocaleString('es-CO')}</p>
+                    <p style="margin: 8px 0 0; color: #2c2526;"><strong>Método de pago:</strong> ${methodLabels[data.method] || data.method}</p>
+
+                </div>
+
+                <p style="color: #8a7a7d; font-size: 13px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e7dcda;">Si no esperabas este correo, ignóralo.</p>
+
+            </div>
+            `,
+        });
+    },
 };
 
 export default emailService;
