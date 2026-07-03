@@ -11,6 +11,21 @@ fetch('http://localhost:3000/api/auth/me', {
 });
 ```
 
+## Índice
+
+- [Auth](#auth)
+- [Users](#users)
+- [Profile](#profile)
+- [Menu](#menu)
+- [Tables](#tables)
+- [Orders](#orders)
+- [Kitchen](#kitchen)
+- [Reservations](#reservations)
+- [Delivery](#delivery)
+- [Inventory](#inventory)
+- [Payments](#payments)
+- [Reports](#reports)
+
 ---
 
 ## Auth — `/api/auth`
@@ -1632,3 +1647,123 @@ Respuesta exitosa `200`:
 
 Errores:
 - `404` — Ítem de inventario no encontrado
+
+## Payments — `/api/payments`
+
+### POST `/api/payments/webhook`
+Ruta pública, sin autenticación. Endpoint que consume Wompi para notificar el resultado de una transacción. Valida la firma del evento antes de procesar. Siempre responde `200` a Wompi (incluso ante errores internos) para evitar reintentos indefinidos del mismo evento; los errores se registran en logs del servidor.
+
+Respuesta `200`:
+```json
+{ "received": true }
+```
+
+Errores:
+- `401` — Firma de evento inválida
+
+### GET `/api/payments`
+Requiere autenticación + rol `administrador`. Lista todos los pagos del sistema.
+
+Respuesta exitosa `200`:
+```json
+{
+  "payments": [
+    {
+      "id": "uuid",
+      "order_id": "uuid",
+      "method": "string",
+      "status": "string",
+      "amount": "number",
+      "transaction_id": "string | null",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
+      "order_type": "string",
+      "order_total": "number"
+    }
+  ]
+}
+```
+
+### POST `/api/payments`
+Requiere autenticación. Registra un pago para un pedido existente. Si el método es `tarjeta` o `pse`, devuelve además los datos necesarios para abrir el Widget de Wompi. Si el método es `efectivo` o `contra_entrega`, el pago queda `pendiente` y no requiere pasarela.
+
+Body:
+```json
+{
+  "order_id": "uuid (requerido)",
+  "method": "string (requerido) - efectivo | tarjeta | pse | contra_entrega"
+}
+```
+
+Respuesta exitosa `201` (método offline):
+```json
+{
+  "message": "Pago registrado exitosamente",
+  "payment": { /* pago creado */ },
+  "checkout": null
+}
+```
+
+Respuesta exitosa `201` (método online):
+```json
+{
+  "message": "Pago registrado exitosamente",
+  "payment": { /* pago creado */ },
+  "checkout": {
+    "public_key": "string",
+    "currency": "COP",
+    "amount_in_cents": "number",
+    "reference": "uuid",
+    "signature": { "integrity": "string" },
+    "redirect_url": "string"
+  }
+}
+```
+
+Errores:
+- `400` — `order_id` o `method` faltantes, o método inválido
+- `404` — Pedido no encontrado
+- `409` — El pedido ya tiene un pago aprobado
+
+### GET `/api/payments/order/:orderId`
+Requiere autenticación. Lista los pagos asociados a un pedido específico.
+
+Respuesta exitosa `200`:
+```json
+{ "payments": [ /* array de pagos */ ] }
+```
+
+### GET `/api/payments/:id`
+Requiere autenticación. Obtiene un pago por su ID.
+
+Errores:
+- `404` — Pago no encontrado
+
+### PATCH `/api/payments/:id/confirm`
+Requiere autenticación + rol `administrador`, `mesero` o `domiciliario`. Confirma o rechaza manualmente un pago pendiente (usado para `efectivo`/`contra_entrega`, o como respaldo si el webhook de Wompi falla). Si el pago queda `aprobado`, envía confirmación por correo al cliente (solo aplica a pedidos a domicilio) y actualiza el estado espejo en `delivery_orders`.
+
+Body:
+```json
+{ "status": "string (requerido) - aprobado | rechazado" }
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Pago actualizado exitosamente", "payment": { /* pago actualizado */ } }
+```
+
+Errores:
+- `400` — `status` inválido, o el pago ya no está en estado `pendiente`
+- `404` — Pago no encontrado
+
+### PATCH `/api/payments/:id/refund`
+Requiere autenticación + rol `administrador`. Marca un pago como reembolsado. Proceso manual en v1 — no se comunica con la API de Wompi.
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Pago reembolsado exitosamente", "payment": { /* pago reembolsado */ } }
+```
+
+Errores:
+- `400` — Solo se pueden reembolsar pagos en estado `aprobado`
+- `404` — Pago no encontrado
