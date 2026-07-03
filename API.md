@@ -25,6 +25,8 @@ fetch('http://localhost:3000/api/auth/me', {
 - [Inventory](#inventory)
 - [Payments](#payments)
 - [Reports](#reports)
+- [Reviws](#reviews)
+- [News](#news)
 
 ---
 
@@ -1767,3 +1769,209 @@ Respuesta exitosa `200`:
 Errores:
 - `400` — Solo se pueden reembolsar pagos en estado `aprobado`
 - `404` — Pago no encontrado
+
+---
+## Reviews — `/api/reviews`
+
+### GET `/api/reviews/public`
+Ruta pública. Lista las reseñas visibles junto con el promedio general de calificaciones del restaurante.
+
+Respuesta exitosa `200`:
+```json
+{
+  "reviews": [
+    {
+      "id": "uuid",
+      "rating": "number",
+      "comment": "string | null",
+      "created_at": "timestamp",
+      "first_name": "string",
+      "last_name": "string"
+    }
+  ],
+  "average_rating": "number",
+  "total_reviews": "number"
+}
+```
+
+### GET `/api/reviews`
+Requiere autenticación + rol `administrador`. Lista todas las reseñas, incluyendo las ocultas.
+
+Respuesta exitosa `200`:
+```json
+{
+  "reviews": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "rating": "number",
+      "comment": "string | null",
+      "is_visible": "boolean",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
+      "first_name": "string",
+      "last_name": "string"
+    }
+  ]
+}
+```
+
+### GET `/api/reviews/my`
+Requiere autenticación. Lista las reseñas del usuario autenticado.
+
+Respuesta exitosa `200`:
+```json
+{ "reviews": [ /* array de reseñas del usuario */ ] }
+```
+
+### POST `/api/reviews`
+Requiere autenticación + rol `cliente`. Crea una reseña. Solo disponible para clientes que hayan completado al menos un pedido a domicilio.
+
+Body:
+```json
+{
+  "rating": "number (requerido) - entero entre 1 y 5",
+  "comment": "string (opcional)"
+}
+```
+
+Respuesta exitosa `201`:
+```json
+{ "message": "Reseña publicada exitosamente", "review": { /* reseña creada */ } }
+```
+
+Errores:
+- `400` — Calificación faltante o fuera de rango (1-5)
+- `403` — El cliente no ha completado ningún pedido a domicilio. Devuelve un mensaje explicativo, no un error genérico
+
+### PATCH `/api/reviews/:id/visibility`
+Requiere autenticación + rol `administrador`. Oculta o muestra una reseña. No permite editar el contenido de la reseña, solo su visibilidad.
+
+Body:
+```json
+{ "is_visible": "boolean (requerido)" }
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Reseña ocultada exitosamente", "review": { /* reseña actualizada */ } }
+```
+
+Errores:
+- `400` — `is_visible` faltante o no es booleano
+- `404` — Reseña no encontrada
+
+---
+
+## News — `/api/news`
+
+### GET `/api/news/public`
+Ruta pública. Lista las noticias publicadas, ordenadas por fecha de publicación descendente.
+
+Respuesta exitosa `200`:
+```json
+{
+  "news": [
+    {
+      "id": "uuid",
+      "title": "string",
+      "body": "string",
+      "published_at": "timestamp",
+      "author_first_name": "string",
+      "author_last_name": "string"
+    }
+  ]
+}
+```
+
+### GET `/api/news/public/:id`
+Ruta pública. Obtiene una noticia publicada por su ID.
+
+Errores:
+- `404` — Noticia no encontrada
+
+### GET `/api/news`
+Requiere autenticación + rol `administrador`. Lista todas las noticias, incluyendo borradores no publicados.
+
+Respuesta exitosa `200`:
+```json
+{
+  "news": [
+    {
+      "id": "uuid",
+      "author_id": "uuid",
+      "title": "string",
+      "body": "string",
+      "is_published": "boolean",
+      "published_at": "timestamp | null",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
+      "author_first_name": "string",
+      "author_last_name": "string"
+    }
+  ]
+}
+```
+
+### POST `/api/news`
+Requiere autenticación + rol `administrador`. Crea una noticia como borrador (no publicada).
+
+Body:
+```json
+{
+  "title": "string (requerido, máx. 255 caracteres)",
+  "body": "string (requerido)"
+}
+```
+
+Respuesta exitosa `201`:
+```json
+{ "message": "Noticia creada exitosamente", "news": { /* noticia creada */ } }
+```
+
+Errores:
+- `400` — Título o contenido faltantes, o título excede 255 caracteres
+
+### PUT `/api/news/:id`
+Requiere autenticación + rol `administrador`. Edita el título y/o contenido de una noticia.
+
+Body:
+```json
+{
+  "title": "string (opcional, máx. 255 caracteres)",
+  "body": "string (opcional)"
+}
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Noticia actualizada exitosamente", "news": { /* noticia actualizada */ } }
+```
+
+Errores:
+- `400` — Título excede 255 caracteres
+- `404` — Noticia no encontrada
+
+### PATCH `/api/news/:id/publish`
+Requiere autenticación + rol `administrador`. Publica una noticia, registrando la fecha de publicación.
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Noticia publicada exitosamente", "news": { /* noticia publicada */ } }
+```
+
+Errores:
+- `400` — La noticia ya está publicada
+- `404` — Noticia no encontrada
+
+### PATCH `/api/news/:id/unpublish`
+Requiere autenticación + rol `administrador`. Despublica una noticia. La fecha original de publicación se conserva para historial.
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Noticia despublicada exitosamente", "news": { /* noticia despublicada */ } }
+```
+
+Errores:
+- `400` — La noticia ya está despublicada
+- `404` — Noticia no encontrada
