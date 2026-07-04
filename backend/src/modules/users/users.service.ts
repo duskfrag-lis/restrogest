@@ -33,6 +33,12 @@ const usersService = {
             throw { status: 400, message: `Rol inválido. Los roles permitidos son: ${EMPLOYEE_ROLES.join(', ')}`};
         }
 
+        const existing = await usersRepository.findByEmail(data.email);
+
+        if (existing) {
+            throw { status: 409, message: 'Ya existe un usuario registrado con ese correo' };
+        }
+
         const user = await usersRepository.createEmployee(data);
         const token = await tokensRepository.create(user.id, 'employee_activation', ACTIVATION_TOKEN_EXPIRY);
 
@@ -48,6 +54,11 @@ const usersService = {
     },
 
     async activateEmployee(token: string, password: string) {
+
+        if (typeof password !== 'string' || password.length < 8) {
+            throw { status: 400, message: 'La contraseña debe tener al menos 8 caracteres' };
+        }
+        
         const tokenRecord = await tokensRepository.findValid(token, 'employee_activation');
 
         if (!tokenRecord) {

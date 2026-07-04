@@ -26,6 +26,12 @@ const usersRepository = {
         return rows;
     },
 
+    async findByEmail(email: string) {
+
+        const { rows } = await pool.query(`SELECT id FROM users WHERE email = $1`, [email]);
+        return rows[0] || null;
+    },
+
     async findById(id: string) {
         const { rows } = await pool.query(
 
