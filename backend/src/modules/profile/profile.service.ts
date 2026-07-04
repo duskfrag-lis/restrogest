@@ -49,6 +49,10 @@ const profileService = {
         const userPassword = await profileRepository.getPassword(id);
         if (!userPassword) throw { status: 404, message: 'Usuario no encontrado' };
 
+        if (!userPassword.password_hash) {
+            throw { status: 400, message: 'Tu cuenta usa Google para iniciar sesión y no tiene contraseña configurada.' };
+        }
+
         const isValid = await bcrypt.compare(currentPassword, userPassword.password_hash);
         if (!isValid) throw { status: 401, message: 'Contraseña actual incorrecta' };
 

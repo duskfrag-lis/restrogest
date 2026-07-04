@@ -68,7 +68,7 @@ const profileRepository = {
     async softDelete(id: string) {
         
         await pool.query(
-            `UPDATE users SET deleted_at = NOW(), is_active = false
+            `UPDATE users SET deleted_at = NOW(), is_active = false, email = 'deleted_' || id || '_' || email
             WHERE id = $1`,
             [id]
         );
