@@ -198,7 +198,7 @@ const authService = {
 
         const token = jwt.sign(
             {
-                id: user.is,
+                id: user.id,
                 email: user.email,
                 role: userWithRole.role,
             },
