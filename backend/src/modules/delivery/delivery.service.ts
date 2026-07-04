@@ -89,7 +89,6 @@ const deliveryService = {
             `INSERT INTO orders (type, status)
             VALUES ('domicilio', 'pendiente') RETURNING *`,
 
-            [data.client_id]
         );
 
         const order = ordersRows[0];

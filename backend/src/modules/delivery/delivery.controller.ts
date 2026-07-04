@@ -140,7 +140,7 @@ const deliveryController = {
             const { type, center_lat, center_lng, radius_km } = req.body;
 
             if (!type || !center_lat || !center_lng || !radius_km) {
-                res.status(400).json({ message: 'Todos los campos de zona de cobertura son obligatorios' });
+                return res.status(400).json({ message: 'Todos los campos de zona de cobertura son obligatorios' });
             }
 
             const result = await deliveryService.updateCoverageZones({
