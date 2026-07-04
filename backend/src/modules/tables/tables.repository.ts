@@ -52,7 +52,7 @@ const tablesRepository = {
                 updated_at = NOW()
             WHERE id = $3
             RETURNING *`,
-            [data.number, data.capacity]
+            [data.number, data.capacity, id]
         );
 
         return rows[0] || null;

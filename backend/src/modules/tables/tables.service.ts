@@ -46,7 +46,7 @@ const tablesService = {
 
             const existing = await tablesRepository.findByNumber(data.number);
 
-            if (existing && existing.is !== id) {
+            if (existing && existing.id !== id) {
                 throw { status: 409, message: `Ya existe una mesa con el número ${data.number} `};
             }
         }

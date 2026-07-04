@@ -21,7 +21,7 @@ const tablesController = {
 
         try {
 
-            const id = req.params.is as string;
+            const id = req.params.id as string;
             const table = await tablesService.getTableById(id);
             return res.status(200).json({ table });
 
@@ -39,7 +39,7 @@ const tablesController = {
             const { number, capacity } = req.body;
 
             if (!number || !capacity) {
-                throw res.status(400).json({ message: 'Número y capacidad son obligatorios' });
+                return res.status(400).json({ message: 'Número y capacidad son obligatorios' });
             }
 
             const result = await tablesService.createTable({ number, capacity });
@@ -94,7 +94,7 @@ const tablesController = {
 
         try {
 
-            const id = req.params.is as string;
+            const id = req.params.id as string;
             const result = await tablesService.deleteTable(id);
             return res.status(200).json(result);
 
