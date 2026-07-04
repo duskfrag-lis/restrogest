@@ -173,7 +173,7 @@ const emailService = {
                     Hola <strong style="color: #2c2526;">${name}</strong>,
                 </p>
 
-                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">Tu reserva ha sido confirmada con los siguientes detalles: </p>}
+                <p style="color: #6f6264; font-size: 15px; line-height: 1.6;">Tu reserva ha sido confirmada con los siguientes detalles: </p>
 
                 <div style="background: #ffff; border-radius: 8px; padding: 16px; margin: 16px 0; border: 1px solid #e7dcda;">
 
