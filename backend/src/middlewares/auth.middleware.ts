@@ -35,7 +35,8 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         (req as any).user = decoded;
         next();
 
-    } catch {
+    } catch (err){
+        console.error('Error en authenticate: ', err);
         return res.status(401).json({ message: 'Token inválido o expirado' });
     }
 }
