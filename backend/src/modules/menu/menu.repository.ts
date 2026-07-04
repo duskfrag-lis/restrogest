@@ -47,7 +47,7 @@ const menuRepository = {
             `UPDATE menu_categories SET name = COALESCE($1, name),
                 description = COALESCE($2, description),
                 sort_order = COALESCE($3, sort_order),
-                is_active = COALESCE($4, is_actibe)
+                is_active = COALESCE($4, is_active)
             WHERE id = $5
             RETURNING *`,
 
@@ -80,7 +80,7 @@ const menuRepository = {
     async findItemById(id: string) {
 
         const { rows } = await pool.query(
-            `SELECT mi.*, mc_name as category_name
+            `SELECT mi.*, mc.name as category_name
             FROM menu_items mi
             JOIN menu_categories mc ON mc.id = mi.category_id
             WHERE mi.id = $1`, [id]
@@ -91,7 +91,7 @@ const menuRepository = {
 
     async findItemsByCategory(categoryId: string, onlyActive = false) {
 
-        const query = onlyActive ? `SELECT * FROM menu_items WHERE category_id = $1 AND is_active = true`
+        const query = onlyActive ? `SELECT * FROM menu_items WHERE category_id = $1 AND is_active = true ORDER BY name ASC`
             : `SELECT * FROM menu_items WHERE category_id = $1 ORDER BY name ASC`;
 
         const { rows } = await pool.query(query, [categoryId]);
@@ -137,7 +137,7 @@ const menuRepository = {
                 price = COALESCE($4, price),
                 image_url = COALESCE($5, image_url),
                 is_active = COALESCE($6, is_active),
-                update_at = NOW()
+                updated_at = NOW()
             WHERE id = $7
             RETURNING *`,
             [data.category_id, data.name, data.description, data.price, data.image_url, data.is_active, id]
