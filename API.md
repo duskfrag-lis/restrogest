@@ -27,10 +27,13 @@ fetch('http://localhost:3000/api/auth/me', {
 - [Reports](#reports)
 - [Reviws](#reviews)
 - [News](#news)
+- [Reports](#reports)
+- [Restaurant_info](#restaurant-info)
 
 ---
 
-## Auth — `/api/auth`
+## Auth
+`/api/auth`
 
 ### POST `/api/auth/register`
 Registra un nuevo usuario con rol `cliente` por defecto.
@@ -238,7 +241,8 @@ router.get('/admin/reports', authenticate, authorize('administrador'), reportsCo
 
 ---
 
-## Users — `/api/users`
+## Users
+`/api/users`
 
 ### POST `/api/users/activate`
 Ruta pública. Activa la cuenta de un empleado usando el token enviado por correo y establece su contraseña.
@@ -389,7 +393,9 @@ o
 
 ---
 
-## Menú — `/api/menu`
+## Menú 
+`/api/menu`
+
 ### GET `/api/menu/categories`
 Ruta pública. Lista todas las categorías del menú.
 
@@ -639,7 +645,8 @@ Requiere autenticación + rol `administrador`. Activa o desactiva un ítem.
 
 ---
 
-### Perfil - `/api/profile`
+### Perfil 
+`/api/profile`
 
 Todos los endpoinst requieren autenticación. El `id` del usuario se obtiene del token JWT - un usuario solo puede gestionar sus propio perfil.
 
@@ -732,7 +739,8 @@ Requiere autenticación. Elimina la cuenta del usuario (soft delete). La sesión
 
 ---
 
-## Tables — `/api/tables`
+## Tables 
+`/api/tables`
 
 ### GET `/api/tables`
 Ruta pública. Lista todas las mesas con su estado actual.
@@ -853,7 +861,8 @@ Requiere autenticación + rol `administrador`. Elimina una mesa. Solo se pueden 
 
 ---
 
-## Orders — `/api/orders`
+## Orders 
+`/api/orders`
 
 Todos los endpoints requieren autenticación.
 
@@ -1026,7 +1035,8 @@ entregado → cerrado
 
 ---
 
-## Kitchen — `/api/kitchen`
+## Kitchen 
+`/api/kitchen`
 
 Todos los endpoints requieren autenticación. Roles permitidos: `cocinero`, `jefe_cocina`, `administrador`.
 
@@ -1120,7 +1130,8 @@ socket.emit('join_waiter', userId);  // mesero
 
 ---
 
-## Delivery — `/api/delivery`
+## Delivery 
+`/api/delivery`
 
 ### GET `/api/delivery/coverage`
 Ruta pública. Obtiene la zona de cobertura configurada del restaurante.
@@ -1290,7 +1301,8 @@ Requiere autenticación + rol `administrador`. Asigna un domiciliario a un pedid
 
 ---
 
-## Reservations — `/api/reservations`
+## Reservations 
+`/api/reservations`
 
 ### GET `/api/reservations/available`
 Ruta pública. Lista las mesas disponibles para una fecha y número de personas específicos.
@@ -1423,7 +1435,8 @@ Requiere autenticación + rol `mesero` o `administrador`. Marca una reserva como
 - `400` — Reserva no confirmada o aún no han pasado 15 minutos
 - `404` — Reserva no encontrada
 
-## Inventory — `/api/inventory`
+## Inventory 
+`/api/inventory`
 
 ### GET `/api/inventory/low-stock`
 Requiere autenticación + rol `administrador` o `jefe_cocina`. Lista los ítems cuya cantidad está en o por debajo de su umbral mínimo.
@@ -1650,7 +1663,8 @@ Respuesta exitosa `200`:
 Errores:
 - `404` — Ítem de inventario no encontrado
 
-## Payments — `/api/payments`
+## Payments 
+`/api/payments`
 
 ### POST `/api/payments/webhook`
 Ruta pública, sin autenticación. Endpoint que consume Wompi para notificar el resultado de una transacción. Valida la firma del evento antes de procesar. Siempre responde `200` a Wompi (incluso ante errores internos) para evitar reintentos indefinidos del mismo evento; los errores se registran en logs del servidor.
@@ -1771,7 +1785,8 @@ Errores:
 - `404` — Pago no encontrado
 
 ---
-## Reviews — `/api/reviews`
+## Reviews 
+`/api/reviews`
 
 ### GET `/api/reviews/public`
 Ruta pública. Lista las reseñas visibles junto con el promedio general de calificaciones del restaurante.
@@ -1863,7 +1878,8 @@ Errores:
 
 ---
 
-## News — `/api/news`
+## News 
+`/api/news`
 
 ### GET `/api/news/public`
 Ruta pública. Lista las noticias publicadas, ordenadas por fecha de publicación descendente.
@@ -1975,3 +1991,150 @@ Respuesta exitosa `200`:
 Errores:
 - `400` — La noticia ya está despublicada
 - `404` — Noticia no encontrada
+
+---
+## Reports 
+`/api/reports`
+
+Todos los endpoints de este módulo requieren autenticación + rol `administrador`. Son de solo lectura — no modifican ningún dato. Todos aceptan un query param `format` (`json` por defecto, `excel`, o `pdf`) para exportar el resultado.
+
+### GET `/api/reports/sales`
+Reporte de ventas filtrado por rango de fechas, agrupado por día, basado en pagos aprobados.
+
+Query params:
+- `start_date` (requerido) — fecha ISO (`2026-07-01`)
+- `end_date` (requerido) — fecha ISO (`2026-07-31`)
+- `format` (opcional) — `json` | `excel` | `pdf`
+
+Respuesta exitosa `200` (`format=json`):
+```json
+{
+  "report": {
+    "by_day": [
+      { "date": "date", "total_payments": "number", "total_amount": "number" }
+    ],
+    "grand_total": "number",
+    "total_transactions": "number"
+  }
+}
+```
+
+Con `format=excel` o `format=pdf`, la respuesta es un archivo binario descargable (`Content-Disposition: attachment`).
+
+Errores:
+- `400` — Fechas faltantes, inválidas, o fecha de inicio posterior a la de fin
+
+### GET `/api/reports/orders-status`
+Reporte de pedidos agrupados por estado en un período.
+
+Query params: mismos que `/sales`.
+
+Respuesta exitosa `200` (`format=json`):
+```json
+{
+  "report": [
+    { "status": "string", "total": "number" }
+  ]
+}
+```
+
+Errores:
+- `400` — Fechas faltantes o inválidas
+
+### GET `/api/reports/top-products`
+Reporte de productos más vendidos en un período, excluyendo pedidos cancelados.
+
+Query params:
+- `start_date`, `end_date` (requeridos)
+- `limit` (opcional) — cantidad de productos a mostrar. Default: `10`
+- `format` (opcional)
+
+Respuesta exitosa `200` (`format=json`):
+```json
+{
+  "report": [
+    {
+      "menu_item_id": "uuid",
+      "name": "string",
+      "total_quantity": "number",
+      "total_revenue": "number"
+    }
+  ]
+}
+```
+
+Errores:
+- `400` — Fechas faltantes o inválidas
+
+### GET `/api/reports/inventory`
+Reporte del estado actual del inventario, incluyendo alertas de bajo stock, próximos a vencer y vencidos.
+
+Query params:
+- `format` (opcional)
+
+Respuesta exitosa `200` (`format=json`):
+```json
+{
+  "report": {
+    "items": [ /* array de ítems de inventario, ver módulo Inventory */ ],
+    "alerts": {
+      "low_stock": [ /* array de ítems */ ],
+      "expiring_soon": [ /* array de ítems */ ],
+      "expired": [ /* array de ítems */ ],
+      "total": "number"
+    }
+  }
+}
+```
+
+---
+
+## Restaurant Info 
+`/api/restaurant-info`
+
+### GET `/api/restaurant-info/public`
+Ruta pública. Muestra la información general del restaurante: nombre, descripción, dirección, teléfono, correo, horario y redes sociales.
+
+Respuesta exitosa `200`:
+```json
+{
+  "info": {
+    "id": "uuid",
+    "name": "string",
+    "description": "string | null",
+    "address": "string | null",
+    "phone": "string | null",
+    "email": "string | null",
+    "schedule": "object | null",
+    "social_links": "object | null",
+    "updated_at": "timestamp"
+  }
+}
+```
+
+Errores:
+- `404` — Información del restaurante no configurada
+
+### PUT `/api/restaurant-info`
+Requiere autenticación + rol `administrador`. Edita la información general del restaurante. No modifica las zonas de cobertura de delivery (se gestionan desde el módulo Delivery).
+
+Body:
+```json
+{
+  "name": "string (opcional)",
+  "description": "string (opcional)",
+  "address": "string (opcional)",
+  "phone": "string (opcional)",
+  "email": "string (opcional)",
+  "schedule": "object (opcional)",
+  "social_links": "object (opcional)"
+}
+```
+
+Respuesta exitosa `200`:
+```json
+{ "message": "Información actualizada exitosamente", "info": { /* información actualizada */ } }
+```
+
+Errores:
+- `400` — Nombre vacío, o correo electrónico inválido
