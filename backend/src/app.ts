@@ -20,6 +20,8 @@ import inventoryRoutes from './modules/inventory/inventory.routes';
 import paymentsRoutes from './modules/payments/payments.routes';
 import reviewsRoutes from './modules/reviews/reviews.routes';
 import newsRoutes from './modules/news/news.routes';
+import reportsRoutes from './modules/reports/reports.routes';
+import restaurantInfoRoutes from './modules/restaurant_info/restaurant_info.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,6 +51,8 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/restaurant-info', restaurantInfoRoutes);
 
 
 app.get('/health', (_req, res) => {
