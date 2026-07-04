@@ -1,7 +1,7 @@
 import kitchenRepository from "./kitchen.repository";
 import { getIO } from '../../config/socket';
 
-const VALID_ITEM_STATUSES = ['pendiente', 'en_preparación', 'listo'];
+const VALID_ITEM_STATUSES = ['pendiente', 'en_preparacion', 'listo'];
 
 const kitchenService = {
 
@@ -69,7 +69,7 @@ const kitchenService = {
 
         if (!order) throw { status: 404, message: 'Pedido no encontrado' };
 
-        if (order.status !== 'en_preparación') {
+        if (order.status !== 'en_preparacion') {
             throw { status: 400, message: 'Solo se pueden marcar como listos pedidos en preparación' };
         }
 
