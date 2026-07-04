@@ -76,11 +76,11 @@ const ordersController = {
 
         try {
 
-            const orderId = req.params.Id as string;
+            const orderId = req.params.id as string;
             const { menu_item_id, quantity, notes } = req.body;
 
             if (!menu_item_id || !quantity) {
-                throw res.status(400).json({ message: 'El ítem y la cantidad son obligatorios' });
+                return res.status(400).json({ message: 'El ítem y la cantidad son obligatorios' });
             }
 
             const item = await ordersService.addItem(orderId, { menu_item_id, quantity, notes });
@@ -137,7 +137,7 @@ const ordersController = {
             const userRole = (req as any).user.role;
         
             if (!status) {
-                throw res.status(400).json({ message: 'El estado es obligatorio' });
+                return res.status(400).json({ message: 'El estado es obligatorio' });
             }
 
             const order = await ordersService.updateStatus(id, status, userId, userRole);

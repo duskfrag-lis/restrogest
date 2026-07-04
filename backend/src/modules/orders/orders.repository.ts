@@ -49,7 +49,7 @@ const ordersRepository = {
 
             `SELECT oi.*, mi.name as item_name, mi.description as item_description
             FROM order_items oi
-            JOIN menu_item mi ON mi.id = oi.menu_items_id
+            JOIN menu_items mi ON mi.id = oi.menu_item_id
             WHERE oi.order_id = $1`,
 
             [orderId]
