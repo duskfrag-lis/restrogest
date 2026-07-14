@@ -64,3 +64,7 @@ export class ApiClient {
     return typeof payload === 'object' && payload !== null && 'message' in payload
   }
 }
+
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
+
+export const apiClient = new ApiClient(apiBaseUrl)
