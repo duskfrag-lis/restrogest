@@ -73,6 +73,24 @@ const authRepository = {
         );
     },
 
+    async invalidateVerificationTokens(userId: string) {
+        await pool.query(
+            `UPDATE tokens SET used_at = NOW()
+            WHERE user_id = $1
+            AND type = 'email_verification'
+            AND used_at IS NULL`,
+            [userId]
+        );
+    },
+
+    async saveVerificationToken(userId: string, token: string, expiresAt: Date) {
+        await pool.query(
+            `INSERT INTO tokens (user_id, token, type, expires_at)
+            VALUES ($1, $2, 'email_verification', $3)`,
+            [userId, token, expiresAt]
+        );
+    },
+
     async updatePassword(userId: string, password_hash: string) {
         await pool.query(
             `UPDATE users SET password_hash = $1 WHERE id = $2`, [password_hash, userId]

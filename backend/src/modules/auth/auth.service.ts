@@ -90,6 +90,23 @@ const authService = {
         return { message: 'Correo verificado correctamente. Ya puedes iniciar sesión.' };
     },
 
+    async resendVerification(email: string){
+
+        const user = await authRepository.findByEmail(email);
+
+        if (!user || user.email_verified || user.provider === 'google') {
+            return;
+        }
+
+        const verificationToken = await tokensRepository.create(
+            user.id, 'email_verification', VERIFICATION_TOKEN_EXPIRY
+        );
+
+        await emailService.sendEmailVerification(
+            user.email, user.first_name, verificationToken
+        );
+    },
+
     async forgotPassword(email: string) {
 
         const user = await authRepository.findByEmail(email);

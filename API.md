@@ -89,6 +89,27 @@ Ruta pública. Verifica el correo de un usuario recién registrado usando el tok
 
 ---
 
+### POST `/api/auth/resend-verification`
+Ruta pública. Reenvía el correo de verificación a un usuario registrado manualmente que aún no ha verificado su cuenta. Invalida cualquier token de verificación anterior y genera uno nuevo (válido 24 horas). Por seguridad, siempre responde con el mismo mensaje genérico, exista o no el correo, esté o no verificado, o use Google como proveedor.
+
+**Body:**
+```json
+{
+  "email": "string (requerido)"
+}
+```
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "message": "Si el correo está registrado y pendiente de verificación, te enviamos un nuevo enlace."
+}
+```
+
+Rate limit: 5 request / 15 minutos 
+
+---
+
 ### POST `/api/auth/forgot-password`
 Ruta pública. Solicita un enlace de recuperación de contraseña (válido 30 minutos). Por seguridad, siempre responde con el mismo mensaje genérico, exista o no el correo en el sistema, y aunque la cuenta use Google como proveedor.
 

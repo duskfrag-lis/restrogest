@@ -72,6 +72,27 @@ const authController = {
         }
     },
 
+    async resendVerification(req: Request, res: Response) {
+
+        try {
+
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ message: 'El correo es requerido '});
+            }
+
+            await authService.resendVerification(email);
+
+            return res.status(200).json({ message: 'Si el correo está registrado y pendiente de verificación, te enviamos un nuevo enlace.'});
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor' });
+        }
+    },
+
     async forgotPassword(req: Request, res: Response) {
 
         try {
