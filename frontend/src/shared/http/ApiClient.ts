@@ -1,70 +1,78 @@
+import { API_BASE_URL } from '../../core/config/env';
+
+type RequestOptions = Omit<RequestInit, 'body'> & {
+
+    body?: unknown;
+    isFormData?: boolean;
+};
+
 export class ApiError extends Error {
-  readonly status: number
 
-  constructor(status: number, message: string) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
+    status: number;
+    payload: unknown;
+
+    constructor(status: number, message: string, payload: unknown) {
+
+        super(message);
+        this.status = status;
+        this.payload = payload;
+    }
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+class ApiClient {
 
-interface RequestOptions {
-  method?: HttpMethod
-  body?: unknown
-}
+    private baseUrl: string;
 
-interface ErrorResponse {
-  message?: string
-}
-
-export class ApiClient {
-  private readonly baseUrl: string
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl.replace(/\/$/, '')
-  }
-
-  async request<TResponse>(path: string, options: RequestOptions = {}): Promise<TResponse> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: options.method ?? 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: options.body ? JSON.stringify(options.body) : undefined,
-    })
-
-    const payload = await this.readJson<TResponse | ErrorResponse>(response)
-
-    if (!response.ok) {
-      const message =
-        this.isErrorResponse(payload) && payload.message
-          ? payload.message
-          : 'No fue posible completar la solicitud'
-
-      throw new ApiError(response.status, message)
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl;
     }
 
-    return payload as TResponse
-  }
+    async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
 
-  private async readJson<TResponse>(response: Response): Promise<TResponse> {
-    const text = await response.text()
+        const { body, isFormData, headers, ...rest } = options;
 
-    if (!text) {
-      return {} as TResponse
+        const finalHeaders: HeadersInit = isFormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers };
+
+        const response = await fetch(`${this.baseUrl}${path}`, {
+
+            ...rest,
+            credentials: 'include',
+            headers: finalHeaders,
+            body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
+        });
+
+        const contentType = response.headers.get('content-type') ?? '';
+
+        const payload = contentType.includes('application/json') ? await response.json() : null;
+
+        if (!response.ok) {
+
+            const message = (payload as { message?: string })?.message ?? 'Ocurrió un error inesperado';
+            throw new ApiError(response.status, message, payload);
+        }
+
+        return payload as T;
     }
 
-    return JSON.parse(text) as TResponse
-  }
+    get<T>(path: string, options?: RequestOptions) {
+        return this.request<T>(path, { ...options, method: 'GET' });
+    }
 
-  private isErrorResponse(payload: unknown): payload is ErrorResponse {
-    return typeof payload === 'object' && payload !== null && 'message' in payload
-  }
+    post<T>(path: string, body?: unknown, options?: RequestOptions) {
+        return this.request<T>(path, { ...options, method: 'POST', body });
+    }
+
+    put<T>(path: string, body?: unknown, options?: RequestOptions) {
+        return this.request<T>(path, { ...options, method: 'PUT', body });
+    }
+
+    patch<T>(path: string, body?: unknown, options?: RequestOptions) {
+        return this.request<T>(path, { ...options, method: 'PATCH', body });
+    }
+
+    delete<T>(path: string, options?: RequestOptions) {
+        return this.request<T>(path, { ...options, method: 'DELETE' });
+    }    
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
-
-export const apiClient = new ApiClient(apiBaseUrl)
+export const apiClient = new ApiClient(API_BASE_URL);
