@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { ApiError } from '../../../shared/http/ApiClient'
 import { authApi } from '../services/authApi'
 import type { LoginCredentials, RegisterData } from '../types/auth.types'
-import { AuthContext, type AuthContextValue, type CurrentUser } from './AuthContext'
+import { AuthContext, type AuthContextValue, type SessionIdentity } from './AuthContext'
 
 interface AuthProviderProps {
 
@@ -11,14 +11,16 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
 
-    const [user, setUser] = useState<CurrentUser | null>(null)
+    const [user, setUser] = useState<SessionIdentity | null>(null)
     const [isBootstrapping, setIsBootstrapping] = useState(true)
 
     useEffect(() => {
 
         let isMounted = true
         authApi.me()
-            .then((result) => { if (isMounted) setUser(result.user) })
+            .then((result) => { 
+                if (isMounted) setUser({ id: result.user.id, email: result.user.email, role: result.user.role }) 
+            })
             .catch(() => { if (isMounted) setUser(null) })
             .finally(() => { if (isMounted) setIsBootstrapping(false) })
         return () => { isMounted = false}
@@ -27,7 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const login = useCallback(async (credentials: LoginCredentials) => {
 
         const result = await authApi.login(credentials)
-        setUser(result.user)
+        setUser({ id: result.user.id, email: result.user.email, role: result.user.role })
     }, [])
 
     const register = useCallback(async (data: RegisterData) => {

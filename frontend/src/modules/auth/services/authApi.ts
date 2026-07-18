@@ -36,6 +36,11 @@ export const authApi = {
         return apiClient.request('/auth/verify-email', { method: 'POST', body: { token }})
     },
 
+    resendVerification(email: string): Promise<{ message: string }> {
+
+        return apiClient.request('/auth/resend-verification', { method: 'POST', body: { email }, })
+    },
+
     forgotPassword(email: string): Promise<{ message: string }> {
 
         return apiClient.request('/auth/forgot-password', { method: 'POST', body: { email }})

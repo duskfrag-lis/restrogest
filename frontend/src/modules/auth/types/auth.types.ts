@@ -24,13 +24,10 @@ export interface RegisterData {
 export interface AuthenticateUser {
 
     id: string
-    first_name?: string
-    last_name?: string
+    first_name: string
+    last_name: string
     email: string
     role: AuthRole
-    is_active?: boolean
-    email_verified?: boolean
-    provider?: 'local' | 'google'
 }
 
 export interface SessionUser {
@@ -38,8 +35,8 @@ export interface SessionUser {
     id: string
     email: string
     role: AuthRole
-    iat?: number
-    exp?: number
+    iat: number
+    exp: number
 }
 
 export interface AuthResult {

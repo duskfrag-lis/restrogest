@@ -1,18 +1,21 @@
 import { createContext } from 'react'
 
 import type {
-    AuthenticateUser,
+    AuthRole,
     LoginCredentials,
     RegisterData,
     RegisterResult,
-    SessionUser,
 } from '../types/auth.types'
 
-export type CurrentUser = AuthenticateUser | SessionUser
+export interface SessionIdentity {
 
+    id: string
+    email: string
+    role: AuthRole
+}
 export interface AuthContextValue {
 
-    user: CurrentUser | null
+    user: SessionIdentity | null
     isBootstrapping: boolean
     login(credentials: LoginCredentials): Promise<void>
     register(data: RegisterData): Promise<RegisterResult>
