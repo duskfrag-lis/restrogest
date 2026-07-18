@@ -1,0 +1,29 @@
+.button {
+
+    display: felx;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-input);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+    transition: background var(--transition-base);
+
+}
+
+.button:hover {
+
+    background: color-mix(in srgb, var(--color-bg-input) 85%, var(--color-accent-dark) 5%);
+}
+
+.icon {
+
+    width: 20px;
+    height: 20px;
+}

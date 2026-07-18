@@ -1,0 +1,108 @@
+.overlay {
+
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: color-mix(in srgb, var(--color-bg-page) 55%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 50;
+}
+
+.card {
+
+    width: min(380px, 100%);
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-3);
+}
+
+.iconBadge {
+
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-accent-tint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+
+    width: 26px;
+    height: 26px;
+    color: var(--color-accent-dark);
+}
+
+.title {
+
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.text {
+
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.feedback {
+
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-accent-tint);
+    border-radius: var(--radius-sm);
+    color: var(--color-accent-dark);
+    font-size: var(--fs-xs);
+    margin: 0;
+}
+
+.primaryAction {
+
+    width: 100%;
+    padding: var(--space-3);
+    background: var(--color-accent-dark);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-on-accent);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: background var(--transition-base);
+}
+
+.primaryAction:hover:not(:disabled) {
+
+    background: var(--color-accent-hover);
+}
+
+.primaryAction:disabled {
+
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.secondaryAction {
+
+    width: 100%;
+    padding: var(--space-3);
+    background: transparent;
+    border: 1.5px solid var(--color-accent-dark);
+    border-radius: var(--radius-sm);
+    color: var(--color-accent-dark);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+}

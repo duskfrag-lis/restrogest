@@ -1,0 +1,138 @@
+.stage {
+
+    position: relative;
+    width: min(920px, 100%);
+    min-height: 620px;
+    margin: auto;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.promoPanel,
+.formPanel {
+
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transition: left var(--transition-base);
+}
+
+.promoPanel {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    background: var(--color-accent-dark);
+    color: var(--color-text-on-accent);
+    text-align: center;
+}
+
+.promoRight {
+
+    left: 50%;
+}
+
+.promoLeft {
+
+    left: 0;
+}
+
+.promoIcon {
+
+    width: 96px;
+    height: 96px;
+    color: var(--color-text-on-accent);
+    opacity: 0.9;
+}
+
+.promoTitle {
+
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    margin: 0;
+}
+
+.promoSubtitle {
+
+    font-size: var(--fs-base);
+    line-height: 1.5;
+    opacity: 0.92;
+    max-width: 320px;
+}
+
+.promoAction {
+
+    padding: var(--space-3) var(--space-6);
+    background: transparent;
+    border: 1.5px solid var(--color-text-on-accent);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-on-accent);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-base);
+    cursor: pointer;
+    transition: background var(--transition-base);
+}
+
+.promoAction:hover {
+
+    background: color-mix(in srgb, var(--color-text-on-accent) 15%, transparent);
+}
+
+.formPanel {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    background: var(--color-bg-surface);
+}
+
+.formLeft {
+
+    left: 0;
+}
+
+.formRight {
+
+    left: 50%;
+}
+
+.formInner {
+
+    width: 100%;
+    max-width: 340px;
+}
+
+@media (max-width: 720px) {
+
+    .stage {
+
+        min-height: auto;
+    }
+
+    .promoPanel,
+    .formPanel {
+
+        position: relative;
+        width: 100%;
+        left: 0 !important;
+    }
+
+    .promoPanel {
+
+        order: 1;
+        padding: var(--space-6);
+    }
+
+    .formPanel {
+
+        order: 2;
+        padding: var(--space-6);
+    }
+}
