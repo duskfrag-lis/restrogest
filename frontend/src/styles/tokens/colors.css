@@ -1,0 +1,18 @@
+:root {
+
+    --color-bg-page: #f5f5ef;
+    --color-bg-surface: #fffff;
+    --color-bg-input: #edeeee;
+    --color-accent: ##7a8b5c;
+    --color-accent-hover: #788a59;
+    --color-accent-dark: #4c5a35;
+    --color-accent-tint: #fafff1;
+    --color-danger: #de8181;
+
+    --color-text-primary: var(--color-accent-dark);
+    --color-text-on-accent: #ffffff;
+    --color-text-placeholder: color-mix(in srgb, var(--color-accent-dark) 45%, transparent);
+    --color-text-muted: color-mix(in srgb, var(--color-accent-dark) 65%, transparent);
+    --color-border-input: color-mix(in srgb, var(--color-accent-dark) 12%, transparent);
+    --color-link: var(--color-danger);
+}

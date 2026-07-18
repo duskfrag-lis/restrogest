@@ -1,0 +1,16 @@
+:root {
+  --font-base: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.8rem;
+  --fs-sm: 0.9rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.15rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.25rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+}
