@@ -1,0 +1,6 @@
+.text {
+
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--fs-base);
+}
