@@ -1,18 +1,26 @@
-:root {
+:root{
 
     --color-bg-page: #f5f5ef;
-    --color-bg-surface: #fffff;
-    --color-bg-input: #edeeee;
-    --color-accent: ##7a8b5c;
+    --color-bg-surface: #ffffff;
+    --color-bg-input: #fafafa;
+    --color-accent: #7a8b5c;
     --color-accent-hover: #788a59;
+    --color-accent-mid: #687a4b;
     --color-accent-dark: #4c5a35;
     --color-accent-tint: #fafff1;
     --color-danger: #de8181;
 
+
+    --color-info-bg: #fff8e8;
+    --color-info-border: color-mix(in srgb, var(--color-accent-mid) 30%, transparent);
+    --color-info-text: var(--color-accent-mid);
+
+
     --color-text-primary: var(--color-accent-dark);
     --color-text-on-accent: #ffffff;
-    --color-text-placeholder: color-mix(in srgb, var(--color-accent-dark) 45%, transparent);
-    --color-text-muted: color-mix(in srgb, var(--color-accent-dark) 65%, transparent);
-    --color-border-input: color-mix(in srgb, var(--color-accent-dark) 12%, transparent);
+    --color-text-muted: #5e6354;
+    --color-text-placeholder: color-mix(in srgb, var(--color-text-muted) 70%, transparent);
+    --color-border-input: #edeeee;
+    --color-border-input-focus: var(--color-accent-dark);
     --color-link: var(--color-danger);
 }
