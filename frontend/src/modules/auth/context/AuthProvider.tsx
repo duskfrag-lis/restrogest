@@ -14,17 +14,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<SessionIdentity | null>(null)
     const [isBootstrapping, setIsBootstrapping] = useState(true)
 
+    const checkSession = useCallback(async () => {
+
+        try {
+
+            const result = await authApi.me()
+            setUser({ id: result.user.id, email: result.user.email, role: result.user.role })
+
+        } catch {
+
+            setUser(null)
+        }
+    }, [])
+
     useEffect(() => {
 
-        let isMounted = true
-        authApi.me()
-            .then((result) => { 
-                if (isMounted) setUser({ id: result.user.id, email: result.user.email, role: result.user.role }) 
-            })
-            .catch(() => { if (isMounted) setUser(null) })
-            .finally(() => { if (isMounted) setIsBootstrapping(false) })
-        return () => { isMounted = false}
-    }, [])
+        checkSession().finally(() => setIsBootstrapping(false))
+
+    }, [checkSession])
 
     const login = useCallback(async (credentials: LoginCredentials) => {
 
@@ -53,8 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, [])
 
     const value = useMemo<AuthContextValue>(
-        () => ({ user, isBootstrapping, login, register, logout }),
-        [isBootstrapping, login, logout, register, user],
+        () => ({ user, isBootstrapping, login, register, logout, checkSession}),
+        [checkSession, isBootstrapping, login, logout, register, user],
     )
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

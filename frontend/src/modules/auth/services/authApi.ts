@@ -1,4 +1,6 @@
 import { apiClient } from '../../../shared/http/ApiClient'
+import { API_BASE_URL } from '../../../core/config/env'
+
 
 import type {
     AuthResult,
@@ -50,4 +52,14 @@ export const authApi = {
 
         return apiClient.request('/auth/reset-password', { method: 'POST', body: { token, password }})
     },
+
+    googleAuthUrl(): string {
+        
+        return `${API_BASE_URL}/auth/google`
+    },
+
+    activateAccount(token: string, password: string): Promise<{ message: string }> {
+
+        return apiClient.request('/users/activate', { method: 'POST', body: { token, password }})
+    }
 }
