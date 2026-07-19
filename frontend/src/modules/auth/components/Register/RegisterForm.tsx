@@ -90,6 +90,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
                 <AuthTextInput
 
+                    name="first_name"
                     placeholder="Nombre"
                     autoComplete="give-name"
                     required
@@ -103,6 +104,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
                 <AuthTextInput
 
+                    name="last_name"
                     placeholder="Apellido"
                     autoComplete="family-name"
                     required
@@ -120,6 +122,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                 <AuthTextInput
 
                     type="tel"
+                    name="phone"
                     placeholder="Teléfono (opcional)"
                     autoComplete="tel"
                     value={phone}
@@ -133,6 +136,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                 <AuthTextInput
 
                     type="email"
+                    name="email"
                     placeholder="Correo electrónico"
                     autoComplete="email"
                     required
@@ -149,6 +153,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
                 <PasswordField
 
+                    name="password"
                     placeholder="Contraseña"
                     autoComplete="new-password"
                     required
@@ -162,6 +167,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
                 <PasswordField
 
+                    name="confirmPassword"
                     placeholder="Confirmar contraseña"
                     autoComplete="new-password"
                     required
