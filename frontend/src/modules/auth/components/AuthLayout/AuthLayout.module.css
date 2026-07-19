@@ -1,13 +1,18 @@
 .stage {
 
     position: relative;
-    width: min(920px, 100%);
+    width: min(920px, calc(100vw - 2 * var(--space-6)));
     min-height: 620px;
     margin: auto;
     background: var(--color-bg-surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     overflow: hidden;
+}
+
+.stageWide {
+
+    width: min(1100px, 100vw - 2 * var(--space-6))
 }
 
 .promoPanel,
@@ -107,6 +112,12 @@
 
     width: 100%;
     max-width: 340px;
+}
+
+.formInnerWide {
+
+    width: 100%;
+    max-width: 460px;
 }
 
 @media (max-width: 720px) {

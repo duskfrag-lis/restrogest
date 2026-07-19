@@ -58,6 +58,7 @@ export function AuthPage() {
 
                         promoActionLabel="Iniciar sesión"
                         onPromoAction={switchToLogin}
+                        wide
                     >
                         <RegisterForm onSuccess={setPendingVerificationEmail} />
                     </AuthLayout>
