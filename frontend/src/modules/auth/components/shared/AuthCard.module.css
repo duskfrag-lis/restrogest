@@ -1,0 +1,18 @@
+.page {
+
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    background: var(--page-bg);
+}
+
+.card {
+
+    width: min(530px, 100%);
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-8);
+}
