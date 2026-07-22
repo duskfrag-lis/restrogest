@@ -44,7 +44,7 @@ export function LoginForm() {
         try {
 
             await login({ email, password })
-            navigate('/', { replace: true })
+            navigate('/account', { replace: true })
 
         } catch (err) {
 

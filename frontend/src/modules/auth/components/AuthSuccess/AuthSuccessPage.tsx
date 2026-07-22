@@ -11,7 +11,7 @@ export function AuthSuccessPage() {
 
     useEffect(() => {
 
-        checkSession().then(() => navigate('/', { replace: true }))
+        checkSession().then(() => navigate('/account', { replace: true }))
     }, [checkSession, navigate])
 
     return (
