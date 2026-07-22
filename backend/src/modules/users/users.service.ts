@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs';
 
 const EMPLOYEE_ROLES = ['mesero', 'cocinero', 'jefe_cocina', 'domiciliario', 'administrador'];
 const ACTIVATION_TOKEN_EXPIRY = 24 * 60 * 60 * 1000;
+const DELETION_COOLDOWN_HOURS = 2;
+const DELETION_RESTRICTED_ROLES = ['cliente', 'administrador'];
 
 const usersService = {
 
@@ -101,6 +103,92 @@ const usersService = {
         const action = isActive ? 'activada' : 'desactivada';
         return { message: `Cuenta ${action} correctamente`};
     },
+
+    async createDeletionRequest(userId: string, userRole: string, reason: string) {
+
+        if (DELETION_RESTRICTED_ROLES.includes(userRole)) {
+
+            throw { status: 403, message: 'Este flujo no aplica para tu rol' };
+        }
+
+        const pending = await usersRepository.findPendingDeletionRequestByUserId(userId);
+
+        if (pending) {
+
+            throw { status: 409, message: 'Ya tienes una solicitud pendiente de revisión' };
+        }
+
+        const latest = await usersRepository.findLatestDeletionRequestByUserId(userId);
+
+        if (latest && latest.status === 'rejected' && latest.resolved_at) {
+
+            const resolvedAt = new Date(latest.resolved_at).getTime();
+            const cooldownEndsAt = resolvedAt + DELETION_COOLDOWN_HOURS * 60 * 60 * 1000;
+            const now = Date.now();
+
+            if (now < cooldownEndsAt) {
+
+                const minutesLeft = Math.ceil((cooldownEndsAt - now) / 60000);
+                throw { status: 429, message: `Debes esperar antes de enviar otra solicitud. Intenta en ${minutesLeft} minutos. ` };
+            }
+
+        }
+
+        return usersRepository.createDeletionRequest(userId, reason);
+    },
+
+    async getMyLatestDeletionRequest(userId: string) {
+
+        return usersRepository.findLatestDeletionRequestByUserId(userId);
+    },
+
+    async listDeletionRequests(status?: string) {
+
+        return usersRepository.findAllDeletionRequestsByStatus(status);
+    },
+
+    async resolveDeletionRequest(requestId: string, adminId: string, status: string, rejectionReason?: string) {
+
+        const request = await usersRepository.findDeletionRequestById(requestId);
+
+        if (!request) {
+
+            throw { status: 404, message: 'Solicitud no encontrada' };
+        }
+
+        if (request.status !== 'pending') {
+
+            throw { status: 409, message: 'Esta solicitud ya fue resuelta' };
+        }
+
+        if (status === 'rejected' && !rejectionReason) {
+
+            throw { status: 400, message: 'Debes indicar el motivo del rechazo' };
+        }
+
+        return usersRepository.resolveDeletionRequest(requestId, status, adminId, rejectionReason ?? null);
+    },
+
+    async assertCanDeleteOwnAccount(userId: string, userRole: string) {
+
+        if (userRole === 'cliente') {
+            return null;
+        }
+
+        if (userRole === 'administrador') {
+
+            throw { status: 403, message: 'Los administradores no pueden eliminar su propia cuenta' };
+        }
+
+        const approved = await usersRepository.findUnusedApprovedDeletionRequestByUserId(userId);
+
+        if (!approved) {
+
+            throw { status: 403, message: 'Necesitas una solicitud de eliminación aprobada por un administrador' };
+        }
+
+        return approved;
+    }
     
 };
 

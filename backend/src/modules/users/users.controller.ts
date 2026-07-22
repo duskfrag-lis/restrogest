@@ -129,6 +129,86 @@ const usersController = {
             return res.status(status).json({ message: err.message || 'Error interno del servidor' });
         }
     },
+
+    async createDeletionRequest(req: Request, res: Response) {
+
+        try {
+
+            const userId = (req as any).user.id;
+            const userRole = (req as any).user.role;
+            const { reason } = req.body;
+
+            if (!reason) {
+
+                return res.status(400).json({ message: 'El motivo es obligatorio' });
+            }
+
+            const request = await usersService.createDeletionRequest(userId, userRole, reason);
+
+            return res.status(201).json({ message: 'Solicitud enviada exitosamente', request });
+
+        } catch  (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor' });
+        }
+    },
+
+    async getMyDeletionRequest(req: Request, res: Response) {
+
+        try {
+
+            const userId = (req as any).user.id;
+            const request = await usersService.getMyLatestDeletionRequest(userId);
+
+            return res.status(200).json({ request });
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor' });
+        }
+    },
+
+    async listDeletionRequest(req: Request, res: Response) {
+
+        try {
+
+            const { status } = req.query;
+            const request = await usersService.listDeletionRequests(status as string | undefined);
+
+            return res.status(200).json({ request });
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor' });
+        }
+    },
+
+    async resolveDeletionRequest(req: Request, res: Response) {
+
+        try {
+
+            const adminId = (req as any).user.id;
+            const id = req.params.id as string
+            const { status, rejection_reason } = req.body;
+
+            if (!['approved', 'rejected'].includes(status)) {
+
+                return res.status(400).json({ message: 'Estado inválido' });
+            }
+
+            const request = await usersService.resolveDeletionRequest(id, adminId, status, rejection_reason);
+
+            return res.status(200).json({ message: 'Solicitud actualizada correctamente', request });
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor' });
+        }
+    },
 };
 
 export default usersController;

@@ -414,6 +414,150 @@ o
 
 ---
 
+### Solicitudes de eliminación de cuenta `/api/users`
+
+Este flujo aplica únicamente a empleados (mesero, cocinero, jefe_cocina, domiciliario). Los clientes eliminan su cuenta directamente desde `DELETE /api/profile`, y los administradores no pueden eliminar su propia cuenta bajo ninguna circunstancia.
+
+### POST `/api/users/me/deletion-request`
+Requiere autenticación. Crea una solicitud de eliminación de cuenta para el empleado autenticado, la cual queda pendiente de revisión por parte de un administrador.
+
+**Body:**
+
+```json
+{
+  "reason": "string (requerido)"
+}
+```
+
+**Respuesta exitosa `201`:**
+```json
+{
+  "message": "Solicitud enviada correctamente",
+  "request": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "reason": "string",
+    "status": "pending",
+    "rejection_reason": null,
+    "resolved_by": null,
+    "resolved_at": null,
+    "used_at": null,
+    "created_at": "timestamp"
+  }
+}
+```
+
+**Errores:**
+
+- `400 `— El motivo es obligatorio
+- `403` — El rol del usuario autenticado es cliente o administrador
+- `409` — Ya existe una solicitud pendiente de revisión para este usuario
+- `429` — La última solicitud fue rechazada y no han pasado 2 horas desde su resolución. El mensaje incluye los minutos restantes
+
+---
+
+### GET `/api/users/me/deletion-request`
+Requiere autenticación. Devuelve la solicitud de eliminación más reciente del usuario autenticado, o `null` si nunca ha solicitado una.
+
+**Respuesta exitosa `200`:**
+
+```json
+{
+  "request": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "reason": "string",
+    "status": "pending | approved | rejected",
+    "rejection_reason": "string | null",
+    "resolved_by": "uuid | null",
+    "resolved_at": "timestamp | null",
+    "used_at": "timestamp | null",
+    "created_at": "timestamp"
+  }
+}
+```
+
+o
+
+```json
+{ "request": null }
+```
+
+---
+
+### GET `/api/users/deletion-requests`
+Requiere autenticación + rol administrador. Lista las solicitudes de eliminación de cuenta.
+
+**Query params:**
+
+status (opcional) — filtra por estado (pending, approved, rejected). Sin este parámetro, devuelve todas las solicitudes
+Respuesta exitosa 200:
+
+```json
+{
+  "requests": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "reason": "string",
+      "status": "pending | approved | rejected",
+      "rejection_reason": "string | null",
+      "resolved_by": "uuid | null",
+      "resolved_at": "timestamp | null",
+      "used_at": "timestamp | null",
+      "created_at": "timestamp",
+      "first_name": "string",
+      "last_name": "string",
+      "email": "string",
+      "role": "string"
+    }
+  ]
+}
+```
+
+**Errores:**
+
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+
+### PATCH `/api/users/deletion-requests/:id`
+Requiere autenticación + rol administrador. Aprueba o rechaza una solicitud de eliminación de cuenta pendiente.
+
+**Body:**
+
+```json
+{
+  "status": "approved | rejected (requerido)",
+  "rejection_reason": "string (requerido solo si status es rejected)"
+}
+```
+**Respuesta exitosa 200:**
+
+```json
+{
+  "message": "Solicitud actualizada correctamente",
+  "request": { /* solicitud actualizada */ }
+}
+```
+
+**Errores:**
+
+- `400` — Estado inválido, o falta rejection_reason cuando status es rejected
+- `401` — No autenticado
+- `403` — Rol distinto a administrador
+- `404` — Solicitud no encontrada
+- `409` — La solicitud ya fue resuelta anteriormente
+
+
+## Nota sobre DELETE /api/profile
+Para empleados (mesero, cocinero, jefe_cocina, domiciliario), este endpoint ahora exige una solicitud de eliminación con status approved y sin usar. Si no existe, responde:
+
+- `403` — Necesitas una solicitud de eliminación aprobada por un administrador
+
+Al completarse la eliminación, la solicitud aprobada queda marcada como usada (used_at) y no puede reutilizarse para una futura eliminación.
+
+---
+
 ## Menú 
 `/api/menu`
 
