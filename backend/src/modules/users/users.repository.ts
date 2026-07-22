@@ -97,6 +97,128 @@ const usersRepository = {
         );
     },
 
+    async findPendingDeletionRequestByUserId(userId: string) {
+
+        const { rows } = await pool.query(
+
+            `SELECT * FROM account_deletion_requests
+            WHERE user_id = $1 AND status = 'pending'`,
+
+            [userId]
+        );
+
+        return rows[0] || null;
+    },
+
+    async findLatestDeletionRequestByUserId(userId: string) {
+
+        const { rows } = await pool.query(
+
+            `SELECT * FROM account_deletion_requests
+            WHERE user_id = $1
+            ORDER BY created_at DESC
+            LIMIT 1`,
+
+            [userId]
+        );
+
+        return rows[0] || null;
+    },
+
+    async createDeletionRequest(userId: string, reason: string) {
+
+        const { rows } = await pool.query(
+
+            `INSERT INTO account_deletion_requests (user_id, reason)
+            VALUES ($1, $2) RETURNING *`,
+
+            [userId, reason]
+        );
+
+        return rows[0];
+    },
+
+    async findAllDeletionRequestsByStatus(status?: string) {
+
+        if (status && status !== 'all') {
+
+            const { rows } = await pool.query(
+
+                `SELECT dr.*, u.first_name, u.last_name, u.email, r.name as role
+                FROM account_deletion_requests dr
+                JOIN users u ON u.id = dr.user_id
+                JOIN user_roles ur ON ur.user_id = u.id
+                JOIN roles r ON r.id = ur.role_id
+                WHERE dr.status = $1
+                ORDER BY dr.created_at DESC`,
+
+                [status]
+            );
+
+            return rows;
+
+        }
+
+        const { rows } = await pool.query(
+
+            `SELECT dr.*, u.first_name, u.last_name, u.email, r.name as role
+            FROM account_deletion_requests dr
+            JOIN users u ON u.id = dr.user_id
+            JOIN user_roles ur ON ur.user_id = u.id
+            JOIN roles r ON r.id = ur.role_id
+            ORDER BY dr.created_at DESC`
+        );
+
+        return rows;
+    },
+
+    async findDeletionRequestById(id: string) {
+
+        const { rows } = await pool.query(
+
+            `SELECT * FROM account_deletion_requests WHERE id = $1`,
+            [id]
+        );
+
+        return rows[0] || null;
+    },
+
+    async resolveDeletionRequest(id: string, status: string, resolvedBy: string, rejectionReason: string | null) {
+
+        const { rows } = await pool.query(
+
+            `UPDATE account_deletion_requests
+            SET status = $1, rejection_reason = $2, resolved_by = $3, resolved_at = NOW()
+            WHERE id = $4 RETURNING *`, 
+            [status, rejectionReason, resolvedBy, id]
+        );
+
+        return rows[0];
+    },
+
+    async markDeletionRequestAsUsed(id: string) {
+
+        await pool.query(
+
+            `UPDATE account_deletion_requests SET used_at = NOW() WHERE id = $1`,
+            [id]
+        );
+    },
+
+    async findUnusedApprovedDeletionRequestByUserId(userId: string) {
+
+        const { rows } = await pool.query(
+
+            `SELECT * FROM account_deletion_requests
+            WHERE user_id = $1 AND status = 'approved' AND used_at IS NULL
+            ORDER BY resolved_at DESC
+            LIMIT 1`,
+            [userId]
+        );
+
+        return rows[0] || null;
+    },
+
 };
 
 export default usersRepository;

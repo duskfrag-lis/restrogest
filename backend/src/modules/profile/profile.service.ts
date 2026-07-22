@@ -2,6 +2,8 @@ import profileRepository from "./profile.repository";
 import { uploadImage, deleteImage } from "../../config/cloudinary";
 import bcrypt from "bcryptjs";
 import fs from 'fs';
+import usersService from "../users/users.service";
+import usersRepository from "../users/users.repository";
 
 
 const profileService = {
@@ -78,7 +80,14 @@ const profileService = {
             throw { status: 403, message: 'Un administrador no puede eliminar su propia cuenta' };
         }
 
+        const approvedRequest = await usersService.assertCanDeleteOwnAccount(id, user.role);
+
         await profileRepository.softDelete(id);
+
+        if (approvedRequest) {
+
+            await usersRepository.markDeletionRequestAsUsed(approvedRequest.id);
+        }
 
         return { message: 'Cuenta eliminada correctamente' };
     }

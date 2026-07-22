@@ -11,5 +11,9 @@ router.get('/:id', authenticate, authorize('administrador'), usersController.get
 router.post('/employees', authenticate, authorize('administrador'), usersController.createEmployee);
 router.patch('/:id/role', authenticate, authorize('administrador'), usersController.changeRole);
 router.patch('/:id/status', authenticate, authorize('administrador'), usersController.setActiveStatus);
+router.post('/me/deletion-request', authenticate, usersController.createDeletionRequest);
+router.get('/me/deletion-request', authenticate, usersController.getMyDeletionRequest);
+router.get('/deletion-requests', authenticate, authorize('administrador'), usersController.listDeletionRequest);
+router.patch('/deletion-requests/:id', authenticate, authorize('administrador'), usersController.resolveDeletionRequest);
 
 export default router;
