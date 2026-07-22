@@ -6,6 +6,8 @@ import { ResetPasswordPage } from "./modules/auth/components/ResetPasswordPage"
 import { VerifyEmailPage } from "./modules/auth/components/VerifyEmail/VerifyEmailPage"
 import { AuthSuccessPage } from "./modules/auth/components/AuthSuccess/AuthSuccessPage"
 import { ActivateAccountPage } from "./modules/auth/components/ActivateAccount/ActivateAccountPage"
+import { PrivateRoute } from "./core/guards/PrivateRoute"
+import { AccountPage } from "./modules/account/components/AccountPage"
 
 
 function App() {
@@ -21,6 +23,10 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/auth/success" element={<AuthSuccessPage />} />
           <Route path="/activate-account" element={<ActivateAccountPage />} />
+
+          <Route element={<PrivateRoute />}>
+            <Route path="/account" element={<AccountPage />}></Route>
+          </Route>
 
           <Route path="/" element={<Navigate to="/login" replace />} />
 
