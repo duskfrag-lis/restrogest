@@ -13,10 +13,10 @@ CREATE TABLE account_deletion_requests (
 );
 
 CREATE UNIQUE INDEX one_pending_request_per_user
-    ON account_deletion_request (user_id)
+    ON account_deletion_requests (user_id)
     WHERE status = 'pending';
 
 CREATE INDEX idx_deletion_requests_user_id
-    ON account_deletion_request (user_id);
+    ON account_deletion_requests (user_id);
 
-CREATE INDEX idx_deletion_requests_status ON account_deletion_request (status);
+CREATE INDEX idx_deletion_requests_status ON account_deletion_requests (status);
