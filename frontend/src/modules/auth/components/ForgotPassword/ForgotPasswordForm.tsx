@@ -6,9 +6,10 @@ import { isValidEmail } from '../../../../shared/utils/validators'
 import { AuthTextInput } from '../shared/AuthTextInput'
 import { AuthErrorBanner } from '../shared/AuthErrorBanner'
 import { AuthInfoBox } from '../shared/AuthInfoBox'
-import { LockIcon } from '../../../../shared/icons/LockIcon'
+import { LockKeyIcon, ArrowLeftIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './ForgotPasswordForm.module.css'
-import { ArrowLeftIcon } from '../../../../shared/icons/ArrowLeftIcon'
+
 
 export function ForgotPasswordForm() {
 
@@ -57,10 +58,10 @@ export function ForgotPasswordForm() {
             <div className={styles.header}>
 
                 <Link to="/login" className={styles.backLink} aria-label="Volver">
-                    <ArrowLeftIcon className={styles.backIcon} />
+                    <Icon icon={ArrowLeftIcon} className={styles.backIcon} weight="bold"/>
                 </Link>
 
-                <LockIcon className = {styles.headerIcon} />
+                <Icon icon={LockKeyIcon} className = {styles.headerIcon} weight="bold"/>
                 <h1 className={styles.title}>Recuperar contraseña</h1>
 
             </div>

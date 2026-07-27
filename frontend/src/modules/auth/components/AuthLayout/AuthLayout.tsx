@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { CutleryIcon } from '../../../../shared/icons/CutleryIcon'
+import { ForkKnifeIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './AuthLayout.module.css'
 
 export type AuthMode = 'login' | 'register'
@@ -28,7 +29,7 @@ export function AuthLayout({
 
             <aside className={`${styles.promoPanel} ${isRegister ? styles.promoLeft : styles.promoRight}`}>
 
-                <CutleryIcon className={styles.promoIcon} />
+                <Icon icon={ForkKnifeIcon} className={styles.promoIcon} weight="bold" />
                 <h2 className={styles.promoTitle}>{promoTitle}</h2>
                 <p className={styles.promoSubtitle}>{promoSubtitle}</p>
                 <button type="button" className={styles.promoAction} onClick={onPromoAction}>{promoActionLabel}</button>

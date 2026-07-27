@@ -3,7 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { authApi } from "../../services/authApi";
 import { ApiError } from "../../../../shared/http/ApiClient";
 import { AuthCard } from "../shared/AuthCard";
-import { LockIcon } from "../../../../shared/icons/LockIcon";
+import { LockKeyIcon } from "@phosphor-icons/react";
+import { Icon } from "../../../../shared/icons/Icon";
 import styles from './VerifyEmailPage.module.css'
 
 type VerificationState= 'loading' | 'success' | 'error'
@@ -42,7 +43,7 @@ export function VerifyEmailPage() {
 
         <AuthCard>
             <div className={styles.content}>
-                <LockIcon className={styles.icon} />
+                <Icon icon={LockKeyIcon} className={styles.icon} weight="bold" />
 
                 {state === 'loading' && <p className={styles.text}>Verificando tu correo...</p>}
 

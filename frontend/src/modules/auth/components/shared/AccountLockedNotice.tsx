@@ -1,4 +1,5 @@
-import { LockIcon } from "../../../../shared/icons/LockIcon";
+import { LockKeyIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './AccountLockedNotice.module.css'
 
 type LockReason = 'disabled' | 'rate_limited'
@@ -30,7 +31,7 @@ export function AccountLockedNotice({ reason }: AccountLockedNoticeProps) {
     return (
 
         <div className={styles.notice}>
-            <LockIcon className={styles.icon} />
+            <Icon icon={LockKeyIcon} className={styles.icon} weight="bold"/>
 
             <div>
                 <p className={styles.title}>{title}</p>

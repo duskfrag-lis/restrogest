@@ -6,7 +6,8 @@ import { ModalOverlay } from "../../../../shared/components/ModalOverlay";
 import { PasswordField } from "../../../auth/components/shared/PasswordField";
 import { PasswordChecklist } from "../../../auth/components/shared/PasswordChecklist";
 import { AuthErrorBanner } from "../../../auth/components/shared/AuthErrorBanner";
-import { LockIcon } from "../../../../shared/icons/LockIcon";
+import { LockKeyIcon } from '@phosphor-icons/react'
+import { Icon } from "../../../../shared/icons/Icon";
 import styles from './ChangePasswordForm.module.css'
 
 
@@ -63,7 +64,7 @@ export function ChangePasswordForm({ onClose }: ChangePasswordFormProps) {
 
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.header}>
-                    <LockIcon className={styles.headerIcon} />
+                    <Icon icon={LockKeyIcon} className={styles.headerIcon} weight="bold"/>
                     <h2 className={styles.title}>Cambiar contraseña</h2>
                 </div>
 

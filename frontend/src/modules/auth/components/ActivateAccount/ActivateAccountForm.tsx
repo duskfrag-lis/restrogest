@@ -6,7 +6,8 @@ import { isPasswordValid } from '../../../../shared/utils/passwordRules'
 import { PasswordField } from '../shared/PasswordField'
 import { PasswordChecklist } from '../shared/PasswordChecklist'
 import { AuthErrorBanner } from '../shared/AuthErrorBanner'
-import { LockIcon } from '../../../../shared/icons/LockIcon'
+import { LockKeyIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './ActivateAccountForm.module.css'
 
 const REDIRECT_DELAY_MS = 2500
@@ -71,7 +72,7 @@ export function ActivateAccountForm() {
 
         <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.header}>
-                <LockIcon className={styles.headerIcon} />
+                <Icon icon={LockKeyIcon} className={styles.headerIcon} weight="bold"/>
                 <h1 className={styles.title}>Activa tu cuenta</h1>
             </div>
 

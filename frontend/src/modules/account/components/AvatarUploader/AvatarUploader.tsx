@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { Avatar } from '../shared/avatar'
-import { CameraIcon } from '../../../../shared/icons/CameraIcon'
+import { Avatar } from '../shared/Avatar'
+import { CameraIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon' 
 import styles from './AvatarUploader.module.css'
 
 interface AvatarUploaderProps {
@@ -61,14 +62,14 @@ export function AvatarUploader({
                     disabled={isUploading}
                     aria-label="Cambiar foto de perfil"
                 >
-                    <CameraIcon className={styles.icon} />
+                    <Icon icon={CameraIcon} className={styles.icon} weight="bold"/>
                 </button>
 
                 <input
 
                     ref={inputRef}
                     type="file"
-                    accept="image/jep,image/png/immage/webp"
+                    accept="image/jpeg,image/png,image/webp"
                     className={styles.hiddenInput}
                     onChange={handleChange}
                 />

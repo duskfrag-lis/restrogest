@@ -1,6 +1,7 @@
-import { UserIcon } from "../../../../shared/icons/UserIcon";
-import { PhoneIcon } from "../../../../shared/icons/PhoneIcon";
-import { EnvelopeIcon } from "../../../../shared/icons/EnvelopeIcon";
+import { UserCircleIcon } from "@phosphor-icons/react";
+import { PhoneIcon } from "@phosphor-icons/react";
+import { EnvelopeIcon } from "@phosphor-icons/react";
+import { Icon } from "../../../../shared/icons/Icon";
 import styles from './ProfileInfoCard.module.css'
 
 
@@ -20,7 +21,7 @@ export function ProfileInfoCard({ firstName, lastName, phone, email }: ProfileIn
 
             <div className={styles.row}>
 
-                <UserIcon className={styles.icon} />
+                <Icon icon={UserCircleIcon} className={styles.icon} weight="bold"/>
 
                 <div>
                     <p className={styles.label}>Nombre completo</p>
@@ -30,7 +31,7 @@ export function ProfileInfoCard({ firstName, lastName, phone, email }: ProfileIn
 
             <div className={styles.row}>
 
-                <PhoneIcon className={styles.icon} />
+                <Icon icon={PhoneIcon} className={styles.icon} weight="bold"/>
 
                 <div>
                     <p className={styles.label}>Teléfono</p>
@@ -40,7 +41,7 @@ export function ProfileInfoCard({ firstName, lastName, phone, email }: ProfileIn
 
             <div className={styles.row}>
 
-                <EnvelopeIcon className={styles.icon} />
+                <Icon icon={EnvelopeIcon} className={styles.icon} weight="bold"/>
 
                 <div>
                     <p className={styles.label}>Correo</p>

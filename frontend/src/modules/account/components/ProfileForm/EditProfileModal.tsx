@@ -5,7 +5,8 @@ import { sanitizeNameInput, sanitizePhoneInput } from "../../../../shared/utils/
 import { ModalOverlay } from "../../../../shared/components/ModalOverlay";
 import { AuthTextInput } from "../../../auth/components/shared/AuthTextInput";
 import { AuthErrorBanner } from "../../../auth/components/shared/AuthErrorBanner";
-import { PencilIcon } from "../../../../shared/icons/PencilIcon";
+import { PencilLineIcon } from "@phosphor-icons/react";
+import { Icon } from "../../../../shared/icons/Icon";
 import type { ProfileUser } from "../../types/account.types";
 import styles from './EditProfileModal.module.css'
 
@@ -63,7 +64,7 @@ export function EditProfileModal({ profile, onClose, onSaved }: EditProfileModal
             <form className={styles.form} onSubmit={handleSubmit}>
 
                 <div className={styles.header}>
-                    <PencilIcon className={styles.headerIcon} />
+                    <Icon icon={PencilLineIcon} className={styles.headerIcon} weight="bold" />
                     <h2 className={styles.title}>Editar información</h2>
                 </div>
 

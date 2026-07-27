@@ -1,5 +1,6 @@
 import { ModalOverlay } from "../../../../shared/components/ModalOverlay";
-import { WarningIcon } from "../../../../shared/icons/WarningIcon";
+import { WarningIcon } from "@phosphor-icons/react";
+import { Icon } from "../../../../shared/icons/Icon";
 import styles from './ConfirmDialog.module.css'
 
 interface ConfirmDialogProps {
@@ -23,7 +24,7 @@ export function ConfirmDialog({
 
             <div className={styles.content}>
 
-                <WarningIcon className={styles.icon} />
+                <Icon icon={WarningIcon} className={styles.icon} weight="bold" />
                 <h2 className={styles.title}>{title}</h2>
                 <p className={styles.description}>{description}</p>
 

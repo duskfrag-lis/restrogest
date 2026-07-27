@@ -1,5 +1,6 @@
 import { useState, forwardRef, type InputHTMLAttributes } from 'react'
-import { EyeIcon } from '../../../../shared/icons/EyeIcon'
+import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './PasswordField.module.css'
 
 type PasswordFieldProps = InputHTMLAttributes<HTMLInputElement>
@@ -23,7 +24,7 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(fu
                     onClick={() => setVisible((current) => !current)}
                     aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
-                    <EyeIcon visible={visible} className={styles.icon} />
+                    <Icon icon={visible ? EyeSlashIcon : EyeIcon}  className={styles.icon} weight="bold" />
                 </button>
             </div>
     )

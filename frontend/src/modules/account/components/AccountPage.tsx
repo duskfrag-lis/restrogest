@@ -13,14 +13,9 @@ import { EditProfileModal } from './ProfileForm/EditProfileModal'
 import { ChangePasswordForm } from './ChangePasswordForm/ChangePasswordForm'
 import { ConfirmDialog } from './shared/ConfirmDialog'
 import { AccountDisclaimer } from './shared/AccountDisclaimer'
-import { PencilIcon } from '../../../shared/icons/PencilIcon'
-import { LockIcon } from '../../../shared/icons/LockIcon'
-import { LogoutIcon } from '../../../shared/icons/LogoutIcon'
-import { TrashIcon } from '../../../shared/icons/TrashIcon'
-import { ArrowRightIcon } from '../../../shared/icons/ArrowRightIcon'
-import { ReceiptIcon } from '../../../shared/icons/ReceiptIcon'
-import { CalendarIcon } from '../../../shared/icons/CalendarIcon'
+import { PencilSimpleLineIcon, LockKeyIcon, SignOutIcon, TrashIcon, ArrowRightIcon, ReceiptIcon, CalendarDotsIcon } from '@phosphor-icons/react'
 import styles from './AccountPage.module.css'
+import { Icon } from '../../../shared/icons/Icon'
 
 
 export function AccountPage() {
@@ -39,7 +34,7 @@ export function AccountPage() {
     const handleLogout = async () => {
 
         await logout()
-        navigate('/login', { replace: true })
+        navigate('/', { replace: true })
     }
 
     const handleAvatarSelect = async (file: File) => {
@@ -109,16 +104,16 @@ export function AccountPage() {
             />
 
             <button type="button" className={styles.editButton} onClick={() => setIsEditOpen(true)}>
-                <PencilIcon className={styles.buttonIcon} />
+                <Icon icon={PencilSimpleLineIcon} className={styles.buttonIcon} weight="bold" />
                 Editar información
             </button>
 
             <button type="button" className={styles.passwordButton} onClick={() => setIsPasswordOpen(true)}>
                 <span className={styles.passwordLeft}>
-                    <LockIcon className={styles.buttonIcon} />
+                    <Icon icon={LockKeyIcon} className={styles.buttonIcon} weight="bold"/>
                     Cambiar contraseña
                 </span>
-                <ArrowRightIcon className={styles.passwordArrow} />
+                <Icon icon={ArrowRightIcon} className={styles.passwordArrow} weight="bold"/>
             </button>
         </>
     )
@@ -135,7 +130,7 @@ export function AccountPage() {
                     <div className={styles.column}>
 
                         <StatCard
-                            icon={<ReceiptIcon />}
+                            icon={<Icon icon={ReceiptIcon} weight="bold"/>}
                             value={0}
                             label="Pedidos realizados"
                             linkLabel="Ver historial"
@@ -143,7 +138,7 @@ export function AccountPage() {
                         />
 
                         <StatCard
-                            icon={<CalendarIcon />}
+                            icon={<Icon icon={CalendarDotsIcon} weight="bold"/> }
                             value={0}
                             label="Reservas activas"
                             linkLabel="Ver reservas"
@@ -151,12 +146,12 @@ export function AccountPage() {
                         />
 
                         <button type="button" className={styles.logoutButton} onClick={handleLogout}>
-                            <LogoutIcon className={styles.buttonIcon} />
+                            <Icon icon={SignOutIcon} className={styles.buttonIcon} weight="bold"/>
                             Cerrar sesión
                         </button>
 
                         <button type="button" className={styles.deleteButton} onClick={() => setIsDeleteOpen(true)}>
-                            <TrashIcon className={styles.buttonIcon} />
+                            <Icon icon={TrashIcon} className={styles.buttonIcon} weight="bold" />
                             Eliminar cuenta
                         </button>
                     </div>
@@ -168,7 +163,7 @@ export function AccountPage() {
                     {profilePanel}
 
                     <button type="button" className={styles.logoutButton} onClick={handleLogout}>
-                        <LogoutIcon className={styles.buttonIcon} />
+                        <Icon icon={SignOutIcon} className={styles.buttonIcon} weight="bold"/>
                         Cerrar sesión
                     </button>
 

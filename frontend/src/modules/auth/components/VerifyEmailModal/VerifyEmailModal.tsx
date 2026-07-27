@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { authApi } from '../../services/authApi'
 import { ApiError } from '../../../../shared/http/ApiClient'
-import { EnvelopeIcon } from '../../../../shared/icons/EnvelopeIcon'
+import { EnvelopeIcon } from '@phosphor-icons/react'
+import { Icon } from '../../../../shared/icons/Icon'
 import styles from './VerifyEmailModal.module.css'
 
 interface VerifyEmailModalProps {
@@ -71,7 +72,7 @@ export function VerifyEmailModal({ email, onBackToLogin }: VerifyEmailModalProps
             <div className={styles.card} role="dialog" aria-modal="true">
 
                 <div className={styles.iconBadge}>
-                    <EnvelopeIcon className={styles.icon} />
+                    <Icon icon={EnvelopeIcon} className={styles.icon} weight='bold'/>
                 </div>
 
                 <h2 className={styles.title}>Verifica tu correo</h2>
