@@ -1,0 +1,43 @@
+.footer {
+
+    background: var(--color-accent-dark);
+    padding: var(--space-5) var(--space-6);
+}
+
+.inner {
+
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.copy {
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-xs);
+    color: color-mix(in srgb, var(--color-text-on-accent) 80%, transparent);
+}
+
+.links {
+
+    display: flex;
+    gap: var(--space-5);
+}
+
+.link {
+
+    font-size: var(--fs-xs);
+    color: color-mix(in srgb, var(--color-text-on-accent) 80%, transparent);
+    text-decoration: none;
+}
+
+.link:hover {
+
+    color: var(--color-text-on-accent);
+}

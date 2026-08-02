@@ -1,0 +1,183 @@
+.header {
+
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--color-bg-surface);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+.inner {
+
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    align-items: center;
+}
+
+.zoneLeft {
+
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.zoneCenter {
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.brand {
+
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-accent-dark);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.nav {
+
+    display: flex;
+    gap: var(--space-5);
+    
+}
+
+.navLink {
+
+    font-size: var(--fs-base);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color var(--transition-base), border-color var(--transition-base);
+}
+
+.navLink:hover {
+
+    color: var(--color-accent-dark);
+}
+
+.navLinkActive {
+
+    color: var(--color-accent-dark);
+    font-weight: var(--fw-bold);
+    border-bottom-color: var(--color-accent-dark);
+}
+
+.iconGroup {
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-right: var(--space-5);
+    border-right: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.iconButton {
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-accent-dark);
+    transition: background var(--transition-base);
+}
+
+.iconButton:hover {
+
+    background: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg-input));
+}
+
+.icon {
+
+    width: 26px;
+    height: 26px;
+    stroke-width: 2.1;
+}
+
+.badge {
+
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--color-danger);
+    color: var(--color-text-on-accent);
+    font-size: 11px;
+    font-weight: var(--fw-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-bg-surface);
+}
+
+.zoneRight {
+
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+.loginButton {
+
+    padding: var(--space-2) var(--space-4);
+    border: 1.5px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    color: var(--color-accent-dark);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.registerButton {
+
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-accent-dark);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-on-accent);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.userButton {
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px var(--space-3) 4px 4px;
+    border-radius: 999px;
+    background: var(--color-bg-input);
+    text-decoration: none;
+    color: var(--color-text-primary);
+}
+
+.userName {
+
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+}
+
+@media (max-width: 900px) {
+
+    .nav {
+
+        display: none;
+    }
+}
