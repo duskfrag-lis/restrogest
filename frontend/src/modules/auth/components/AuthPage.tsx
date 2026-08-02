@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AuthLayout, type AuthMode } from './AuthLayout/AuthLayout'
 import { LoginForm } from './Login/LoginForm'
 import { RegisterForm } from './Register/RegisterForm'
@@ -7,7 +8,10 @@ import styles from './AuthPage.module.css'
 
 export function AuthPage() {
 
-    const [mode, setMode] = useState<AuthMode>('login')
+    const [searchParams] = useSearchParams()
+    const initialMode: AuthMode = searchParams.get('mode') === 'register' ? 'register' : 'login'
+
+    const [mode, setMode] = useState<AuthMode>(initialMode)
     const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
 
     const switchToLogin = () => {
