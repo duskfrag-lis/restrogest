@@ -1,9 +1,11 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../modules/auth/hooks/useAuth'
+import { saveRedirectPath } from '../../shared/utils/redirectStorage'
 
 export function PrivateRoute() {
 
     const { user, isBootstrapping } = useAuth()
+    const location = useLocation()
 
     if (isBootstrapping) {
 
@@ -12,7 +14,8 @@ export function PrivateRoute() {
 
     if (!user) {
 
-        return <Navigate to="/login" replace />
+        saveRedirectPath(location.pathname)
+        return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />
     }
 
     return <Outlet />

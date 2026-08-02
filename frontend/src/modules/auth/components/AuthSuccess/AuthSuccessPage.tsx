@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { AuthCard } from "../shared/AuthCard";
 import styles from './AuthSuccessPage.module.css'
+import { getAndClearRedirectPath } from "../../../../shared/utils/redirectStorage";
 
 export function AuthSuccessPage() {
 
@@ -11,7 +12,12 @@ export function AuthSuccessPage() {
 
     useEffect(() => {
 
-        checkSession().then(() => navigate('/account', { replace: true }))
+        checkSession().then(() => {
+
+            const redirectTo = getAndClearRedirectPath('/')
+            navigate(redirectTo, { replace: true })
+        })
+        
     }, [checkSession, navigate])
 
     return (

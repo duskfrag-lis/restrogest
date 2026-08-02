@@ -12,7 +12,7 @@ export function GuestRouter() {
 
     if (user) {
 
-        return <Navigate to="/account" replace />
+        return <Navigate to="/" replace />
     }
 
     return <Outlet />

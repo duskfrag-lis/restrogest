@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { ApiError } from '../../../../shared/http/ApiClient'
@@ -8,12 +8,14 @@ import { AuthErrorBanner } from '../shared/AuthErrorBanner'
 import { AccountLockedNotice } from '../shared/AccountLockedNotice'
 import { GoogleAuthButton } from '../GoogleAuthButton/GoogleAuthButton'
 import styles from './LoginForm.module.css'
+import { saveRedirectPath } from '../../../../shared/utils/redirectStorage'
 
 export function LoginForm() {
 
     const { login } = useAuth()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
+    const redirectTo = searchParams.get('redirect') ?? '/'
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -27,6 +29,17 @@ export function LoginForm() {
 
     const [lockReason, setLockReason] = useState<'disabled' | 'rate_limited' | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    useEffect(() => {
+
+        const redirectParam = searchParams.get('redirect')
+
+        if (redirectParam) {
+
+            saveRedirectPath(redirectParam)
+        }
+
+    }, [searchParams])
 
     const clearFeedback = () => {
 
@@ -44,7 +57,7 @@ export function LoginForm() {
         try {
 
             await login({ email, password })
-            navigate('/account', { replace: true })
+            navigate(redirectTo, { replace: true })
 
         } catch (err) {
 
