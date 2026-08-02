@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeftIcon } from "@phosphor-icons/react";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 import { Icon } from "../../../../shared/icons/Icon";
 import styles from './StatCard.module.css'
 
@@ -24,7 +24,7 @@ export function StatCard({ icon, value, label, linkLabel, to }: StatCardProps) {
             <Link to={to} className={styles.link}>
             
                 {linkLabel}
-                <Icon icon={ArrowLeftIcon} className={styles.linkIcon} weight="bold" />
+                <Icon icon={ArrowRightIcon} className={styles.linkIcon} weight="bold" />
             </Link>
         </div>
     )

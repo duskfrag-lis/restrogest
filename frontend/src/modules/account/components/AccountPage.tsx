@@ -88,7 +88,7 @@ export function AccountPage() {
                     isUploading={isUploadingPhoto}
                 />
 
-                <div>
+                <div className={styles.profileText}>
                     <h1 className={styles.greeting}>Hola, {profile.first_name}</h1>
                     <p className={styles.role}>{formatRoleLabel(profile.role)}</p>
                     <p className={styles.since}>desde {formatLongDate(profile.created_at)}</p>
@@ -130,7 +130,7 @@ export function AccountPage() {
                     <div className={styles.column}>
 
                         <StatCard
-                            icon={<Icon icon={ReceiptIcon} weight="bold"/>}
+                            icon={<Icon icon={ReceiptIcon} size={40} weight="bold"/>}
                             value={0}
                             label="Pedidos realizados"
                             linkLabel="Ver historial"
@@ -138,7 +138,7 @@ export function AccountPage() {
                         />
 
                         <StatCard
-                            icon={<Icon icon={CalendarDotsIcon} weight="bold"/> }
+                            icon={<Icon icon={CalendarDotsIcon} size={40} weight="bold"/> }
                             value={0}
                             label="Reservas activas"
                             linkLabel="Ver reservas"

@@ -137,7 +137,7 @@ export function ChangePasswordForm({ onClose }: ChangePasswordFormProps) {
 
                     <div className={styles.actions}>
 
-                        <button type="button" className={styles.save} onClick={onClose} disabled={isSubmitting}>
+                        <button type="button" className={styles.cancel} onClick={onClose} disabled={isSubmitting}>
                             Cancelar
                         </button>
 

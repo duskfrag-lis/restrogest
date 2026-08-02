@@ -47,6 +47,13 @@
     gap: var(--space-4);
 }
 
+.profileText {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .greeting {
 
     font-size: var(--fs-xl);
@@ -59,7 +66,7 @@
 
     font-size: var(--fs-base);
     color: var(--color-text-muted);
-    margin: var(--space-1) 0 0 var(--space-1);
+    margin: var(--space-1) 0 0 
 }
 
 .since {
@@ -87,8 +94,8 @@
 
 .buttonIcon {
 
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
 }
 
 .editButton {
@@ -120,8 +127,8 @@
 
 .passwordArrow {
 
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     color: var(--color-text-muted);
 }
 
