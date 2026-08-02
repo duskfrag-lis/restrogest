@@ -1,0 +1,22 @@
+.viewport {
+
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding: var(--space-4) 0;
+}
+
+.track {
+
+    display: flex;
+    gap: var(--space-4);
+    width: max-content;
+    will-change: transform;
+}
+
+.card {
+
+    flex-shrink: 0;
+    transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
