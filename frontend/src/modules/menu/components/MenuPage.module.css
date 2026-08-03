@@ -1,0 +1,43 @@
+.page {
+
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-6);
+}
+
+.loading {
+
+    min-width: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+}
+
+.header {
+
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.title {
+
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-extrabold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.subtitle {
+
+    font-size: var(--fs-base);
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.grid {
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-5);
+}
