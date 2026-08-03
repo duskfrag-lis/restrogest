@@ -37,6 +37,7 @@ class ApiClient {
 
             ...rest,
             credentials: 'include',
+            cache: 'no-store',
             headers: finalHeaders,
             body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
         });
