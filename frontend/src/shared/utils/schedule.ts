@@ -19,6 +19,14 @@ export interface ScheduleRow {
     hours: string
 }
 
+export interface ScheduleValidationResult {
+
+    isValid: boolean
+    reason?: string
+}
+
+const JS_DAY_TO_KEY = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado']
+
 export function buildSheduleRows(schedule: RestaurantSchedule): ScheduleRow[] {
 
     return DAY_ORDER.map((day) => ({
@@ -51,3 +59,50 @@ function formatTime(time: string): string {
 
     return `${displayHours}:${minutes} ${period}`
 }
+
+export function isWithinSchedule(
+
+    schedule: RestaurantSchedule,
+    dateStr: string,
+    timeStr: string,
+    durationMinutes: number,
+
+): ScheduleValidationResult {
+
+    const date = new Date(`${dateStr}T${timeStr}:00`)
+    const dayKey = JS_DAY_TO_KEY[date.getDay()]
+    const daySchedule = schedule[dayKey]
+
+    if (!daySchedule || daySchedule.toLowerCase() === 'cerrado') {
+
+        return { isValid: false, reason: 'El restaurante está cerrado ese día' }
+    }
+
+    const [openStr, closeStr] = daySchedule.split('-')
+
+    if (!openStr || !closeStr) {
+
+        return { isValid: false, reason: 'Horario configurado incorrectamente' }
+    }
+
+    const reservationStart = toMinutes(timeStr)
+    const reservationEnd = reservationStart + durationMinutes
+    const openMinutes = toMinutes(openStr)
+    const closeMinutes = toMinutes(closeStr)
+
+    if (reservationStart < openMinutes || reservationEnd > closeMinutes) {
+
+        return { isValid: false, reason: `El restaurante atiende de ${formatTime(openStr)} a ${formatTime(closeStr)} ese día`}
+    }
+
+    return { isValid: true }
+    
+}
+
+function toMinutes(time: string): number {
+
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 60 + minutes
+}
+
+
