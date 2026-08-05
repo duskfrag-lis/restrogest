@@ -38,7 +38,7 @@ export function LoginRequiredNotice({ onClose }: LoginRequiredNoticeProps) {
                 Iniciar sesión
             </button>
 
-            <button type="button" className={styles.secondaryButton} onClick={() => goTo('/register')}>
+            <button type="button" className={styles.secondaryButton} onClick={() => goTo('/login?mode=register')}>
                 Crear cuenta
             </button>
         </div>
