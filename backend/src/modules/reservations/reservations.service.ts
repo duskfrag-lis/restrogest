@@ -1,6 +1,49 @@
 import reservationsRepository from './reservations.repository';
 import tablesRepository from '../tables/tables.repository';
 import emailService from '../../config/email';
+import restaurantInfoRepository from '../restaurant_info/restaurant_info.reporisoty';
+
+const JS_DAY_TO_KEY = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+const RESERVATION_DURATION_MINUTES = 120;
+
+function toMinutes(time: string): number {
+
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 60 + minutes;
+}
+
+async function validateWithinSchedule(reservationDate: Date) {
+
+    const info = await restaurantInfoRepository.find();
+
+    if (!info || !info.schedule) {
+        throw { status: 400, message: 'Las reservas no están disponibles hasta que se configure el horario del restaurante' };
+    }
+
+    const dayKey = JS_DAY_TO_KEY[reservationDate.getDay()];
+    const daySchedule = info.schedule[dayKey];
+
+    if (!daySchedule || daySchedule.toLowerCase() === 'cerrado') {
+        throw { status: 400, message: 'El restaurante está cerrado ese día' };
+    }
+
+    const [openStr, closeStr] = daySchedule.split('-');
+
+    if (!openStr || !closeStr) {
+        throw { status: 400, message: 'Horario del restaurante configurado incorrectamente' };
+    }
+
+    const timeStr = reservationDate.toTimeString().slice(0, 5);
+    const reservationStart = toMinutes(timeStr);
+    const reservationEnd = reservationStart + RESERVATION_DURATION_MINUTES;
+    const openMinutes = toMinutes(openStr);
+    const closeMinutes = toMinutes(closeStr);
+
+    if (reservationStart < openMinutes || reservationEnd > closeMinutes) {
+        throw { status: 400, message: `El restaurante atiende de ${openStr} a ${closeStr} ese día. La reserva debe caber dentro de ese horario` };
+    }
+
+}
 
 const reservationsService = {
 
@@ -44,6 +87,8 @@ const reservationsService = {
             throw { status: 400, message: 'Las reservas deben hacerse con mínimo 2 horas de anticipación' };
         }
 
+        await validateWithinSchedule(reservationDate);
+
         return await reservationsRepository.findAvailableTables(reservationDate, partySize);
     },
 
@@ -75,6 +120,8 @@ const reservationsService = {
         if (data.party_size < 1) {
             throw { status: 400, message: 'El número de personas debe ser mayor a 0' };
         }
+
+        await validateWithinSchedule(reservationDate);
 
         const table = await tablesRepository.findById(data.table_id);
 

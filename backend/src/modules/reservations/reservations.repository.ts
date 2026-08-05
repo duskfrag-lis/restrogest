@@ -73,8 +73,8 @@ const reservationsRepository = {
             AND rt.id NOT IN (
                 SELECT table_id FROM reservations
                 WHERE status = 'confirmada'
-                AND reserved_at BETWEEN $2::timestamp - interval '2 hours'
-                AND $2::timestamp + interval '2 hours'
+                AND $2::timestamp < reserved_at + interval '2 hours'
+                AND $2::timestamp + interval '2 hours' > reserved_at
             )
             ORDER BY rt.number ASC`,
 
