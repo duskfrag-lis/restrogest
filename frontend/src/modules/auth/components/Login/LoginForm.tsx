@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { ApiError } from '../../../../shared/http/ApiClient'
 import { AuthTextInput } from '../shared/AuthTextInput'
@@ -13,9 +13,7 @@ import { saveRedirectPath } from '../../../../shared/utils/redirectStorage'
 export function LoginForm() {
 
     const { login } = useAuth()
-    const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-    const redirectTo = searchParams.get('redirect') ?? '/'
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -57,7 +55,6 @@ export function LoginForm() {
         try {
 
             await login({ email, password })
-            navigate(redirectTo, { replace: true })
 
         } catch (err) {
 

@@ -1,9 +1,17 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../modules/auth/hooks/useAuth'
+import { getAndClearRedirectPath } from '../../shared/utils/redirectStorage'
+import { useRef } from 'react'
 
 export function GuestRouter() {
 
     const { user, isBootstrapping } = useAuth()
+    const redirectTargetRef = useRef<string | null>(null)
+
+    if (redirectTargetRef.current === null) {
+
+        redirectTargetRef.current = getAndClearRedirectPath('/')
+    }
 
     if (isBootstrapping) {
 
@@ -12,7 +20,7 @@ export function GuestRouter() {
 
     if (user) {
 
-        return <Navigate to="/" replace />
+        return <Navigate to={redirectTargetRef.current} replace />
     }
 
     return <Outlet />
