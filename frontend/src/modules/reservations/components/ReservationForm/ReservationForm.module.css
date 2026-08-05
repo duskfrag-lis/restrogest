@@ -1,0 +1,101 @@
+.card {
+    width: 340px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-5);
+    margin: var(--space-6) auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--space-5);
+}
+
+.title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--color-text-primary);
+    margin: var(--space-2) 0 var(--space-1);
+}
+
+.subtitle {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-primary);
+    display: block;
+    margin-bottom: var(--space-1);
+}
+
+.input {
+    width: 100%;
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border-input);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-family: var(--font-base);
+    font-size: var(--fs-sm);
+    color: var(--color-text-primary);
+    box-sizing: border-box;
+    margin-bottom: var(--space-4);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-border-input-focus);
+}
+
+.availableBadge {
+    background: var(--color-accent-tint);
+    color: var(--color-accent-dark);
+    font-size: var(--fs-xs);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.unavailableBadge {
+    background: var(--color-info-bg);
+    color: var(--color-danger);
+    font-size: var(--fs-xs);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+}
+
+.button {
+    width: 100%;
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.disclaimer {
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: var(--space-3) 0 0;
+}
