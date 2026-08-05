@@ -1,0 +1,45 @@
+.wrapper {
+    text-align: center;
+    padding: var(--space-5) 0;
+}
+
+.average {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.stars {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-1);
+    margin: var(--space-2) 0;
+}
+
+.total {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+}
+
+.button {
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: background var(--transition-base);
+}
+
+.button:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+}
+
+.button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
