@@ -8,6 +8,7 @@ router.get('/public', reviewsController.getPublicReviews);
 router.use(authenticate);
 
 router.get('/my', reviewsController.getMyReviews);
+router.get('/eligibility', authorize('cliente'), reviewsController.checkEligibility);
 router.get('/', authorize('administrador'), reviewsController.getAllReviews);
 router.post('/', authorize('cliente'), reviewsController.create);
 router.patch('/:id/visibility', authorize('administrador'), reviewsController.setVisibility);

@@ -30,7 +30,7 @@ const reviewsService = {
 
     async create(data: CreateReviewDTO) {
 
-        if (data.rating === undefined || data.rating || null) {
+        if (data.rating === undefined || data.rating === null) {
             throw { status: 400, message: 'La calificación es obligatoria' };
         }
 
@@ -55,6 +55,12 @@ const reviewsService = {
 
         return await reviewsRepository.setVisibility(id, isVisible);
     },
+
+    async checkEligibility(userId: string) {
+
+        const hasCompletedOrder = await reviewsRepository.hasCompletedDeliveryOrder(userId)
+        return { hasCompletedOrder };
+    }
 };
 
 export default reviewsService;

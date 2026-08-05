@@ -83,6 +83,21 @@ const reviewsController = {
             return res.status(status).json({ message: err.message || 'Error interno del servidor'});
         }
     },
+
+    async checkEligibility(req: Request, res: Response) {
+
+        try {
+
+            const user = (req as any).user;
+            const result = await reviewsService.checkEligibility(user.id);
+            return res.status(200).json(result);
+
+        } catch (err: any) {
+
+            const status = err.status || 500;
+            return res.status(status).json({ message: err.message || 'Error interno del servidor'})
+        }
+    }
 };
 
 export default reviewsController;
