@@ -15,7 +15,6 @@ export const authRoutes = (
             <Route path="/login" element={<AuthPage />} />
         </Route>
         
-        <Route path="/login" element={<AuthPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
