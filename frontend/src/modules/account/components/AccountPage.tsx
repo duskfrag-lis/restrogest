@@ -33,8 +33,8 @@ export function AccountPage() {
 
     const handleLogout = async () => {
 
-        await logout()
         navigate('/', { replace: true })
+        await logout()
     }
 
     const handleAvatarSelect = async (file: File) => {
