@@ -6,6 +6,7 @@ import { PlaceholderPage } from "../shared/components/PlaceholderPage"
 import { AccountPage } from "../modules/account/components/AccountPage"
 import { MenuPage } from "../modules/menu/components/MenuPage"
 import { ReviewsPage } from "../modules/reviews/components/ReviewsPage"
+import { ReservationsPage } from "../modules/reservations/components/ReservationsPage"
 
 
 export const publicRoutes = (
@@ -19,7 +20,7 @@ export const publicRoutes = (
         <Route path="/noticias" element={<PlaceholderPage title="Noticias" />} />
         <Route path="/contacto" element={<PlaceholderPage title="Contacto" />} />
         <Route path="/cart" element={<PlaceholderPage title="Carrito" />} />
-        <Route path="/reservations" element={<PlaceholderPage title="Reservas" />} />
+        <Route path="/reservations" element={<ReservationsPage/>} />
 
         <Route element={<PrivateRoute />}>
             <Route path="/account" element={<AccountPage />} />
