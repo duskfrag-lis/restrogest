@@ -14,3 +14,14 @@ export interface PublicReviewResponse {
     average_rating: number
     total_reviews: number
 }
+
+export interface EligibilityResponse {
+
+    hasCompletedOrder: boolean
+}
+
+export interface CreateReviewPayload {
+
+    rating: number
+    comment?: string
+}
