@@ -1491,7 +1491,8 @@ Ruta pública. Lista las mesas disponibles para una fecha y número de personas 
 ```
 
 **Errores:**
-- `400` — Fecha inválida o menos de 2 horas de anticipación
+- `400` — Fecha inválida o menos de 2 horas de anticipación, restaurante sin horario configurado, restaurante cerrado ese día, o la reserva no cabe dentro del horario de atención
+
 
 ---
 
@@ -1564,7 +1565,7 @@ Requiere autenticación + rol `cliente`. Crea una reserva. Envía confirmación 
 ```
 
 **Errores:**
-- `400` — Campos faltantes, menos de 2h de anticipación, capacidad insuficiente, o mesa no disponible
+- `400` — Campos faltantes, menos de 2h de anticipación, restaurante sin horario configurado, restaurante cerrado ese día, la reserva no cabe dentro del horario de atención, capacidad insuficiente, o mesa no disponible
 - `404` — Mesa no encontrada
 
 ---
@@ -2002,6 +2003,14 @@ Requiere autenticación. Lista las reseñas del usuario autenticado.
 Respuesta exitosa `200`:
 ```json
 { "reviews": [ /* array de reseñas del usuario */ ] }
+```
+
+### GET `/api/reviews/eligibility`
+Requiere autenticación + rol `cliente`. Indica si el cliente autenticado cumple el requisito para dejar una reseña (al menos un pedido a domicilio entregado).
+
+Respuesta exitosa `200`:
+```json
+{ "hasCompletedOrder": "boolean" }
 ```
 
 ### POST `/api/reviews`
