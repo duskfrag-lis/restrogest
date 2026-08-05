@@ -6,7 +6,7 @@ export function useRequireAuth() {
 
     const { user } = useAuth()
     const navigate = useNavigate()
-    const location = useLocation
+    const location = useLocation()
 
     function requireAuth(action: () => void) {
 

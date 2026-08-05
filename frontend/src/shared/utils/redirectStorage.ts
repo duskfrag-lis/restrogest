@@ -13,3 +13,8 @@ export function getAndClearRedirectPath(fallback: string): string {
 
     return stored ?? fallback
 }
+
+export function peekRedirectPath(fallback: string): string {
+
+    return sessionStorage.getItem(REDIRECT_KEY) ?? fallback
+}

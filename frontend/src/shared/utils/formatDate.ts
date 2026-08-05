@@ -24,3 +24,25 @@ export function formatRoleLabel(role: string): string {
 
     return labels[role] ?? role
 }
+
+export function formatRelativeDate(isoDate: string): string {
+
+    const date = new Date(isoDate)
+    const now = new Date()
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000)
+    const diffHours = Math.floor(diffMinutes / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMinutes < 1) return 'Hace un momento'
+    if (diffMinutes < 60) return `Hace ${diffMinutes} min`
+    if (diffHours < 24) return `Hace ${diffHours} ${diffHours === 1 ? 'hora' : 'horas'}`
+    if (diffDays < 7) return `Hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`
+
+    if (diffDays < 30) {
+
+        const weeks = Math.floor(diffDays / 7)
+        return `Hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`
+    }
+
+    return formatLongDate(isoDate)
+}
