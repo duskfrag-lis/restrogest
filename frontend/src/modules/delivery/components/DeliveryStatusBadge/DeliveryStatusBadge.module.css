@@ -1,0 +1,17 @@
+.badge {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+
+.recibido, .en_preparacion, .en_camino {
+    background: var(--color-info-bg);
+    color: var(--color-accent-mid);
+}
+
+.entregado {
+    background: var(--color-accent-tint);
+    color: var(--color-accent-dark);
+}
