@@ -1384,7 +1384,39 @@ Requiere autenticación + rol `cliente`. Lista los pedidos a domicilio del clien
 ---
 
 ### GET `/api/delivery/:id`
-Requiere autenticación + rol `cliente`, `domiciliario` o `administrador`. Obtiene un pedido a domicilio por su ID.
+Requiere autenticación + rol `cliente`, `domiciliario` o `administrador`. Obtiene un pedido a domicilio por su ID, incluyendo los ítems del pedido.
+
+**Respuesta exitosa `200`:**
+```json
+{
+  "delivery": {
+    "id": "uuid",
+    "order_id": "uuid",
+    "client_id": "uuid",
+    "deliverer_id": "uuid | null",
+    "address": "string",
+    "phone": "string",
+    "status": "string",
+    "payment_method": "string",
+    "payment_status": "string",
+    "client_lat": "number",
+    "client_lng": "number",
+    "total": "number",
+    "created_at": "timestamp",
+    "items": [
+      {
+        "id": "uuid",
+        "menu_item_id": "uuid",
+        "item_name": "string",
+        "item_description": "string | null",
+        "quantity": "number",
+        "unit_price": "number",
+        "notes": "string | null"
+      }
+    ]
+  }
+}
+```
 
 **Errores:**
 - `404` — Pedido no encontrado
