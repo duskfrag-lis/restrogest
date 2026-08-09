@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/hooks/useAuth'
 import { useAccount } from '../hooks/useAccount'
@@ -16,6 +16,8 @@ import { AccountDisclaimer } from './shared/AccountDisclaimer'
 import { PencilSimpleLineIcon, LockKeyIcon, SignOutIcon, TrashIcon, ArrowRightIcon, ReceiptIcon, CalendarDotsIcon } from '@phosphor-icons/react'
 import styles from './AccountPage.module.css'
 import { Icon } from '../../../shared/icons/Icon'
+import { reservationsApi } from '../../reservations/services/reservationsApi'
+import { deliveryApi } from '../../delivery/services/deliveryApi'
 
 
 export function AccountPage() {
@@ -30,6 +32,25 @@ export function AccountPage() {
     const [isDeleting, setIsDeleting] = useState(false)
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
     const [deleteError, setDeleteError] = useState<string | null>(null)
+
+    const [orderCount, setOrderCount] = useState(0)
+    const [activeReservationCount, setActiveReservationCount] = useState(0)
+
+    useEffect(() => {
+
+        deliveryApi.getMy()
+            .then((result) => setOrderCount(result.deliveries.length))
+            .catch(() => setOrderCount(0))
+
+        reservationsApi.getMy()
+            .then((result) => {
+
+                const active = result.reservations.filter((r) => r.status === 'confirmada')
+                setActiveReservationCount(active.length)
+            })
+            .catch(() => setActiveReservationCount(0))
+
+    }, [])
 
     const handleLogout = async () => {
 
@@ -131,18 +152,18 @@ export function AccountPage() {
 
                         <StatCard
                             icon={<Icon icon={ReceiptIcon} size={40} weight="bold"/>}
-                            value={0}
+                            value={orderCount}
                             label="Pedidos realizados"
                             linkLabel="Ver historial"
-                            to="/orders/history"
+                            to="/account/orders"
                         />
 
                         <StatCard
                             icon={<Icon icon={CalendarDotsIcon} size={40} weight="bold"/> }
-                            value={0}
+                            value={activeReservationCount}
                             label="Reservas activas"
                             linkLabel="Ver reservas"
-                            to="/reservations"
+                            to="/account/reservations"
                         />
 
                         <button type="button" className={styles.logoutButton} onClick={handleLogout}>

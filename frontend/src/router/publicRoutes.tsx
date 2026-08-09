@@ -7,6 +7,8 @@ import { AccountPage } from "../modules/account/components/AccountPage"
 import { MenuPage } from "../modules/menu/components/MenuPage"
 import { ReviewsPage } from "../modules/reviews/components/ReviewsPage"
 import { ReservationsPage } from "../modules/reservations/components/ReservationsPage"
+import { MyDeliveriesPage } from "../modules/delivery/components/MyDeliveriesPage"
+import { MyReservationsPage } from "../modules/reservations/components/MyReservationsPage/MyReservationsPage"
 
 
 export const publicRoutes = (
@@ -24,6 +26,8 @@ export const publicRoutes = (
 
         <Route element={<PrivateRoute />}>
             <Route path="/account" element={<AccountPage />} />
+            <Route path="/account/orders" element={<MyDeliveriesPage />} />
+            <Route path="/account/reservations" element={<MyReservationsPage />} />
         </Route>
     </Route>
 )
