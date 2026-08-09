@@ -36,7 +36,9 @@ const deliveryService = {
 
         if (!delivery) throw { status: 404, message: 'Pedido a domicilio no encontrado' };
 
-        return delivery;
+        const items = await ordersRepository.findItemsByOrderId(delivery.order_id);
+
+        return { ...delivery, items };
     },
 
     async getMyDeliveries(clientId: string) {
