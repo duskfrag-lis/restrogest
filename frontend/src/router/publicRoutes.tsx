@@ -9,6 +9,8 @@ import { ReviewsPage } from "../modules/reviews/components/ReviewsPage"
 import { ReservationsPage } from "../modules/reservations/components/ReservationsPage"
 import { MyDeliveriesPage } from "../modules/delivery/components/MyDeliveriesPage"
 import { MyReservationsPage } from "../modules/reservations/components/MyReservationsPage/MyReservationsPage"
+import { NewsPage } from "../modules/news/components/NewsPage"
+import { NewsDetailPage } from "../modules/news/components/NewsDetailPage/NewsDetailPage"
 
 
 export const publicRoutes = (
@@ -19,7 +21,8 @@ export const publicRoutes = (
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/nosotros" element={<PlaceholderPage title="Nosotros" />} />
         <Route path="/resenas" element={<ReviewsPage />} />
-        <Route path="/noticias" element={<PlaceholderPage title="Noticias" />} />
+        <Route path="/noticias" element={<NewsPage />} />
+        <Route path="/noticias/:id" element={<NewsDetailPage /> } />
         <Route path="/contacto" element={<PlaceholderPage title="Contacto" />} />
         <Route path="/cart" element={<PlaceholderPage title="Carrito" />} />
         <Route path="/reservations" element={<ReservationsPage/>} />
