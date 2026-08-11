@@ -11,6 +11,7 @@ import { MyDeliveriesPage } from "../modules/delivery/components/MyDeliveriesPag
 import { MyReservationsPage } from "../modules/reservations/components/MyReservationsPage/MyReservationsPage"
 import { NewsPage } from "../modules/news/components/NewsPage"
 import { NewsDetailPage } from "../modules/news/components/NewsDetailPage/NewsDetailPage"
+import { ContactPage } from "../modules/restaurant-info/components/ContactPage/ContactPage"
 
 
 export const publicRoutes = (
@@ -23,7 +24,7 @@ export const publicRoutes = (
         <Route path="/resenas" element={<ReviewsPage />} />
         <Route path="/noticias" element={<NewsPage />} />
         <Route path="/noticias/:id" element={<NewsDetailPage /> } />
-        <Route path="/contacto" element={<PlaceholderPage title="Contacto" />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="/cart" element={<PlaceholderPage title="Carrito" />} />
         <Route path="/reservations" element={<ReservationsPage/>} />
 
