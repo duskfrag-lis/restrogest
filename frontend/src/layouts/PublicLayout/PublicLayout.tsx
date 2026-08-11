@@ -9,7 +9,7 @@ export function PublicLayout() {
 
         <div className={styles.page}>
             <PublicHeader />
-            <main>
+            <main className={styles.main}>
                 <Outlet />
             </main>
             <Footer />
