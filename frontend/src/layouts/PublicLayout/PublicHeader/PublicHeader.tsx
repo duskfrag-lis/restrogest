@@ -12,7 +12,6 @@ const NAV_ITEMS = [
 
     { label: 'Inicio', to: '/', end: true },
     { label: 'Menú', to: '/menu', end: false },
-    { label: 'Nosotros', to: '/nosotros', end: false },
     { label: 'Reseñas', to: '/resenas', end: false },
     { label: 'Noticias', to: '/noticias', end: false },
     { label: 'Contacto', to: '/contacto', end: false },
