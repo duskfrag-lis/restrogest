@@ -135,6 +135,27 @@ npm run dev        # levantar el servidor en modo desarrollo
 npm run build      # compilar TypeScript
 ```
 
+## Docker
+
+El backend tiene un `Dockerfile` multi-stage con tres etapas:
+
+- **`deps`** — solo instala dependencias (incluye devDependencies). La usa el modo desarrollo.
+- **`build`** — compila TypeScript (`npm run build`).
+- **`production`** — imagen final, sin devDependencies, corre el código ya compilado.
+
+```bash
+npm run migrate   # solo corre automáticamente en la imagen de producción al iniciar el contenedor
+npm run dev        # modo desarrollo dentro del contenedor (hot reload vía volumen montado)
+```
+
+**Importante:** en el contenedor de producción, el `CMD` del Dockerfile corre `node dist/database/migrate.js && node dist/app.js` — las migraciones se aplican automáticamente al arrancar. En el contenedor de desarrollo (`docker-compose.dev.yml`), el comando es `npm run dev` directamente, así que las migraciones **no** corren solas; hay que ejecutarlas a mano:
+
+```bash
+docker compose -f ../docker-compose.dev.yml exec backend npm run migrate
+```
+
+Instrucciones completas de Docker (variables de entorno, ambos modos, troubleshooting) en [EJECUCION.md](../EJECUCION.md) en la raíz del repositorio.
+
 ## Convenciones de Git
 
 - Gitflow: ramas `feature/<modulo>-backend`, `fix/<descripcion>` para correcciones.

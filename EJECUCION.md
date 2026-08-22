@@ -1,6 +1,87 @@
 # Guia de ejecucion local
 
-Esta guia explica como correr backend y frontend para que el flujo de autenticacion funcione completo en desarrollo local.
+Esta guia explica como correr backend y frontend para que el flujo completo funcione en local. Hay dos formas: con Docker (recomendada, no requiere instalar PostgreSQL en tu máquina) o de forma manual.
+
+## Opción A: con Docker (recomendado)
+
+### Requisitos
+
+- Docker Desktop instalado y corriendo.
+- Estar ubicado en la raíz del repositorio `restrogest`.
+
+### 1. Configurar variables de entorno
+
+El proyecto usa tres archivos `.env`, cada uno con un propósito distinto:
+
+| Archivo | Para qué sirve |
+|---|---|
+| `.env` (raíz) | Variables que usa `docker-compose.yml` para crear el contenedor de Postgres (`DB_USER`, `DB_PASSWORD`, `DB_NAME`) y para el build del frontend (`VITE_API_URL`) |
+| `backend/.env` | Variables que usa la app del backend en runtime (conexión a BD, JWT, OAuth, Cloudinary, Wompi, Resend) |
+| `frontend/.env` | Variable(s) que Vite incrusta en el bundle al compilar (`VITE_API_URL`) |
+
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Completa los valores reales en los tres (ver cada `.env.example` para la lista completa).
+
+### 2. Levantar en modo desarrollo (hot reload)
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+Este modo monta tu código como volumen: los cambios en `backend/src` o `frontend/src` se reflejan sin reconstruir la imagen.
+
+### 3. Ejecutar migraciones (primera vez, y cada vez que agregues una nueva)
+
+**Importante:** en modo desarrollo las migraciones no corren automáticamente al iniciar el contenedor — eso solo pasa en producción. Ejecútalas manualmente:
+
+```bash
+docker compose -f docker-compose.dev.yml exec backend npm run migrate
+```
+
+### 4. Verificar que todo levantó
+
+```bash
+docker compose -f docker-compose.dev.yml ps
+```
+
+Los tres servicios (`postgres`, `backend`, `frontend`) deben estar `Up`, no `Restarting`.
+
+```bash
+curl http://localhost:3000/health
+```
+
+Respuesta esperada:
+```json
+{"status":"ok","project":"RestroGest"}
+```
+
+Abre `http://localhost:5173` en el navegador.
+
+### 5. Modo producción
+
+```bash
+docker compose up -d --build
+```
+
+Diferencias con desarrollo: el frontend se sirve compilado desde nginx (no Vite dev server), el backend corre desde `dist/` ya compilado, y las migraciones sí corren automáticamente al iniciar el contenedor.
+
+### Comandos útiles
+
+```bash
+docker compose -f docker-compose.dev.yml logs -f backend   # logs en vivo
+docker compose -f docker-compose.dev.yml exec backend sh   # entrar al contenedor
+docker compose -f docker-compose.dev.yml down               # apagar todo
+docker compose -f docker-compose.dev.yml down -v             # apagar y borrar la base de datos
+```
+
+---
+
+## Opción B: sin Docker (instalación manual)
 
 ## Requisitos
 
@@ -31,13 +112,24 @@ Instala dependencias:
 npm install
 ```
 
-Crea el archivo `.env` a partir de `.env.example`:
+Crea el archivo `.env` a partir de `.env.example`. Además de conexión y auth, completa también los servicios externos (Resend, Cloudinary, Wompi, Google Oauth) - algunos clientes se inicializan al cargar el módulo, así que un valor vacío puede impedir que el servidor arranque: 
 
 ```env
 PORT=3000
 FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgresql://usuario:contrasena@localhost:5432/restrogest
 JWT_SECRET=una_clave_larga_y_privada
+RESEND_API_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+WOMPI_API_URL=
+WOMPI_PUBLIC_KEY=
+WOMPI_PRIVATE_KEY=
+WOMPI_EVENTS_SECRET=
 ```
 
 Ejecuta las migraciones:
