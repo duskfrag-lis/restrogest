@@ -219,6 +219,55 @@ const usersRepository = {
         return rows[0] || null;
     },
 
+    async countByRole(role: string) {
+
+        const { rows } = await pool.query(
+
+            `SELECT COUNT(*)::int as count
+            FROM user_roles ur
+            JOIN roles r ON r.id = ur.role_id
+            WHERE r.name = $1`,
+
+            [role]
+        );
+
+        return rows[0].count;
+    },
+
+    async createAdminAccount(data: {
+
+        first_name: string;
+        last_name: string;
+        email: string;
+        password_hash: string;
+    }) {
+
+        const { rows } = await pool.query(
+
+            `INSERT INTO users (first_name, last_name, email, password_hash, provider, is_active, email_verified)
+            VALUES ($1, $2, $3, $4, 'local', true, true)
+            RETURNING id, first_name, last_name, email`,
+
+            [data.first_name, data.last_name, data.email, data.password_hash]
+        );
+
+        const user = rows[0];
+
+        const { rows: roleRows } = await pool.query(
+
+            `SELECT id FROM roles WHERE name = 'administrador'`
+        );
+
+        if (!roleRows[0]) throw new Error(`El rol 'administrador' no existe en la base de datos`);
+
+        await pool.query(
+
+            `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)`,  [user.id, roleRows[0].id]
+        );
+
+        return user;
+    },
+
 };
 
 export default usersRepository;

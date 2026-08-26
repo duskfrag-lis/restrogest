@@ -21,4 +21,4 @@ RUN mkdir -p uploads
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "node dist/database/migrate.js && node dist/app.js"]
+CMD ["sh", "-c", "node dist/database/migrate.js && node dist/database/seed.js && node dist/app.js"]
