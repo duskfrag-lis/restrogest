@@ -35,13 +35,15 @@ docker compose -f docker-compose.dev.yml up -d --build
 
 Este modo monta tu código como volumen: los cambios en `backend/src` o `frontend/src` se reflejan sin reconstruir la imagen.
 
-### 3. Ejecutar migraciones (primera vez, y cada vez que agregues una nueva)
+### 3. Ejecutar migraciones y crear la cuenta administrador (primera vez, y cada vez que agregues una migración nueva)
 
-**Importante:** en modo desarrollo las migraciones no corren automáticamente al iniciar el contenedor — eso solo pasa en producción. Ejecútalas manualmente:
+**Importante:** en modo desarrollo las migraciones y el seed no corren automáticamente al iniciar el contenedor — eso solo pasa en producción. Ejecútalas manualmente, en este orden:
 
 ```bash
 docker compose -f docker-compose.dev.yml exec backend npm run migrate
+docker compose -f docker-compose.dev.yml exec backend npm run seed
 ```
+El seed crea la cuenta administrador inicial usando `ADMIN_EMAIL` y `ADMIN_PASSWORD` de `backend/.env`. Es idempotente: si ya existe una cuenta con rol administrador, no hace nada.
 
 ### 4. Verificar que todo levantó
 
@@ -77,6 +79,20 @@ docker compose -f docker-compose.dev.yml logs -f backend   # logs en vivo
 docker compose -f docker-compose.dev.yml exec backend sh   # entrar al contenedor
 docker compose -f docker-compose.dev.yml down               # apagar todo
 docker compose -f docker-compose.dev.yml down -v             # apagar y borrar la base de datos
+```
+
+### Troubleshooting: el contenedor no ve archivos nuevos o cambios en `package.json`
+
+Si el repositorio vive dentro de una carpeta sincronizada por OneDrive dentro de WSL, el bind mount de Docker Desktop puede quedar desactualizado respecto a cambios recientes en el host — típicamente después de agregar un archivo nuevo o editar `package.json`. Síntomas: `npm error Missing script`, o un archivo que existe según `git status` pero no aparece con `ls` dentro del contenedor.
+
+```bash
+docker compose -f docker-compose.dev.yml restart backend
+```
+
+Si persiste:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --force-recreate backend
 ```
 
 ---
@@ -136,6 +152,12 @@ Ejecuta las migraciones:
 
 ```bash
 npm run migrate
+```
+
+Crea la cuenta administrador inicial (agrega `ADMIN_EMAIL` y `ADMIN_PASSWORD` a `backend/.env` antes de este paso):
+
+```bash
+ npm run seed
 ```
 
 Levanta el backend:
@@ -213,12 +235,13 @@ Luego reinicia ambos servidores para que lean las nuevas variables.
 
 1. Levantar PostgreSQL.
 2. Ejecutar migraciones del backend con `npm run migrate`.
-3. Levantar backend con `npm run dev`.
-4. Levantar frontend con `npm run dev`.
-5. Entrar a `http://localhost:5173/`.
-6. Registrar un usuario.
-7. Iniciar sesion con ese usuario.
-8. Probar cerrar sesion.
+3. Crear la cuenta administrador con `npm run seed` (requiere `ADMIN_EMAIL`/`ADMIN_PASSWORD` en `backend/.env`).
+4. Levantar backend con `npm run dev`.
+5. Levantar frontend con `npm run dev`.
+6. Entrar a `http://localhost:5173/`.
+7. Iniciar sesion con la cuenta administrador sembrada.
+8. Registrar un usuario cliente normal (opcional, para probar ese flujo).
+9. Probar cerrar sesion.
 
 ## 5. Comandos de verificacion
 

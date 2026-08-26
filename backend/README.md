@@ -58,6 +58,7 @@ backend/
 │       ├── migrate.ts          # Script runner de migraciones
 │       ├── migrations/         # Archivos .sql, ejecutados en orden alfabético/numérico
 │       └── seeds/               # (reservado para datos de prueba, no en uso actualmente)
+|       └── seed.ts              # Crea la cuenta administrador inicial (idempotente)
 ├── .env.example
 └── package.json
 ```
@@ -119,6 +120,30 @@ Ver `.env.example` para la lista completa. Grupos principales:
 - Email: `RESEND_API_KEY`
 - Imágenes: `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - Pagos: `WOMPI_API_URL`, `WOMPI_PUBLIC_KEY`, `WOMPI_PRIVATE_KEY`, `WOMPI_EVENTS_SECRET`
+- Administrador inicial (seed): `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_FIRST_NAME` (opcional), `ADMIN_LAST_NAME` (opcional)
+
+## Cuenta administrador inicial (seed)
+
+El proyecto no permite crear la cuenta administrador desde el registro público ni por auto-asignación al primer usuario registrado. El endpoint de registro es público, así que si el primer rol admin dependiera de quién se registra primero, cualquiera con acceso a la URL desplegada (antes de que el dueño del proyecto se registre) podría tomar esa cuenta. Por eso, la cuenta admin se crea mediante un seed idempotente que corre fuera del alcance de la red pública, antes de que el sistema reciba tráfico.
+
+`src/database/seed.ts`:
+
+1. Lee `ADMIN_EMAIL` y `ADMIN_PASSWORD` desde variables de entorno. Si faltan, aborta.
+2. Rechaza el password si sigue siendo el valor de ejemplo del `.env.example` (`CHANGE_ME_BEFORE_DEPLOY`) o si tiene menos de 8 caracteres.
+3. Verifica si ya existe alguna cuenta con rol `administrador`. Si existe, no hace nada — es seguro correr el seed más de una vez.
+4. Si no existe ninguna, crea la cuenta con `provider = 'local'`, `email_verified = true`, y el mismo hash de `bcrypt` (`bcrypt.hash(password, 10)`) que usa el resto del sistema.
+
+El seed nunca loggea el password ni el hash — solo mensajes de estado.
+
+```bash
+npm run seed
+```
+
+**Variables adicionales en `.env`:** `ADMIN_EMAIL`, `ADMIN_PASSWORD` (obligatorias), `ADMIN_FIRST_NAME`, `ADMIN_LAST_NAME` (opcionales, por defecto "Admin RestroGest").
+
+**Cuentas de Google con el correo del admin:** si alguien intenta iniciar sesión con Google usando el mismo correo del admin sembrado, el login se rechaza — la estrategia de Google verifica el `provider` de la cuenta existente y no permite login por Google si el correo ya está registrado con otro provider.
+
+**Limitación conocida:** el seed no valida si `ADMIN_EMAIL` ya está en uso por otra cuenta (cliente, empleado) antes de intentar crear el admin — a diferencia de `register()` y `createEmployee()`, que sí llaman a `findByEmail` primero. Si el correo ya existe, el `INSERT` falla por el constraint `UNIQUE (email)` con un error de base de datos crudo, no un mensaje amigable. Pendiente de mejora.
 
 ## Estado del proyecto y limitaciones conocidas
 
@@ -148,10 +173,11 @@ npm run migrate   # solo corre automáticamente en la imagen de producción al i
 npm run dev        # modo desarrollo dentro del contenedor (hot reload vía volumen montado)
 ```
 
-**Importante:** en el contenedor de producción, el `CMD` del Dockerfile corre `node dist/database/migrate.js && node dist/app.js` — las migraciones se aplican automáticamente al arrancar. En el contenedor de desarrollo (`docker-compose.dev.yml`), el comando es `npm run dev` directamente, así que las migraciones **no** corren solas; hay que ejecutarlas a mano:
+**Importante:** en el contenedor de producción, el `CMD` del Dockerfile corre `node dist/database/migrate.js && node dist/database/seed.js && node dist/app.js` — las migraciones y el seed del administrador se aplican automáticamente al arrancar, en ese orden. En el contenedor de desarrollo (`docker-compose.dev.yml`), el comando es `npm run dev` directamente, así que ni las migraciones ni el seed corren solos; hay que ejecutarlos a mano, en orden:
 
 ```bash
 docker compose -f ../docker-compose.dev.yml exec backend npm run migrate
+docker compose -f ../docker-compose.dev.yml exec backend npm run seed
 ```
 
 Instrucciones completas de Docker (variables de entorno, ambos modos, troubleshooting) en [EJECUCION.md](../EJECUCION.md) en la raíz del repositorio.
