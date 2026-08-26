@@ -13,3 +13,4 @@ Formato usado (Michael Nygard): **Contexto → Decisión → Alternativas consid
 | [0003](./0003-wompi-sin-conectar.md) | Integración de Wompi implementada pero no conectada | Aceptado |
 | [0004](./0004-sin-licencia.md) | Repositorio sin licencia open source | Aceptado |
 | [0005](./0005-arquitectura-en-capas-por-modulo-backend.md) | Arquitectura en capas por módulos en el backend | Aceptado |
+| [0006](./0006-seed-idempotente-cuenta-administrador.md) | Seed idempotente para la cuenta administrador inicial | Aceptado |
